@@ -6,6 +6,13 @@ import java.util.ArrayList;
 import com.mdvrp.Customer;
 import com.mdvrp.Depot;
 
+/**
+ * This class is an helper object to accelerate execution of the scripts
+ * It contains some pre-calculated values, like the distances among customers / depot,
+ * an ordered version of customers.
+ * @author Webking
+ *
+ */
 public class Accelerator {
 
 	private static Accelerator instance;
@@ -21,7 +28,12 @@ public class Accelerator {
 		return instance;
 	}
 	
-	// Matrice dei costi
+	/**
+	 * Returns the distance between customer with ID idA and customer with id idB
+	 * @param idA
+	 * @param idB
+	 * @return
+	 */
 	public double getDistanceBetween(int idA,int idB)
 	{		
 		if (distances == null)
@@ -34,6 +46,10 @@ public class Accelerator {
 		
 	}
 
+	/**
+	 * Simply pre-caclulates distances among customers/depot. Those distances are stored within the accelerator and can be grabbed 
+	 * by using getDistanceBetween() method.
+	 */
 	private void precalculateDistances()
 	{		
 		// To be invoked only if customers and depot are filled up
@@ -74,6 +90,11 @@ public class Accelerator {
 		}
 	}
 
+	/**
+	 * Initializes the Accelerator: sets the list of customers ordered by their ID and the main depot.
+	 * @param customers
+	 * @param depot
+	 */
 	public void setData(ArrayList<Customer> customers, Depot depot) {
 		// Store a local copy for customers and depot
 		this.customers = (Customer[])customers.toArray(new Customer[0]);
@@ -81,10 +102,18 @@ public class Accelerator {
 	}
 
 
+	/**
+	 * Returns the Point2D location, pointing to the depot.
+	 * @return
+	 */
 	public Point2D getDepotLocaltion() {
 		return depot.getLocation();
 	}
 
+	/**
+	 * Returns the depot "closing" time. All vehicles must get back within this time.
+	 * @return
+	 */
 	public double getDepotDueTime() {
 		return depot.getEndTw();
 	}
