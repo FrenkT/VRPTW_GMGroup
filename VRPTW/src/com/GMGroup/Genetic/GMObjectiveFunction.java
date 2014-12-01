@@ -3,6 +3,7 @@ package com.GMGroup.Genetic;
 import java.awt.geom.Point2D;
 
 import org.jgap.Gene;
+import org.jgap.IChromosome;
 
 import com.mdvrp.Customer;
 import com.mdvrp.Depot;
@@ -26,7 +27,7 @@ public class GMObjectiveFunction {
 	 * @param e
 	 * @return
 	 */
-	public static double evaluate(MyChromosome e)
+	public static double evaluate(IChromosome e)
 	{
 		
 		double totalLen = 0;

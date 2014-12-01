@@ -11,6 +11,10 @@ import java.util.Random;
 
 
 
+
+
+
+import org.jgap.BaseChromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -24,12 +28,10 @@ import com.mdvrp.Depot;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
-public class MyChromosome implements IChromosome{
+public class MyChromosome extends BaseChromosome{
 
 	private static final boolean DEBUG = true;
 	public static final int VEICHLE_MARKER = 0;
-	
-	private Gene[] genes;
 	
 	/** 
 	 * 
@@ -37,7 +39,7 @@ public class MyChromosome implements IChromosome{
 	 * @throws Exception 
 	 *  
 	 **/
-	public static MyChromosome generateInitialChromosome() throws Exception
+	public static MyChromosome generateInitialChromosome(Configuration conf) throws Exception
 	{
 		Random rnd = new Random();
 		rnd.setSeed((new Date()).getTime());
@@ -159,40 +161,56 @@ public class MyChromosome implements IChromosome{
 		toRemove.clear();
 		
 		// Costruisco l'oggetto chromosome a partire dai risultati ottenuti.
-		return new MyChromosome(veichles);
+		return new MyChromosome(conf,veichles);
 		
 	}
 	
 	
 	public Object clone()
 	{
-		return null;
+		try {
+			MyChromosome cloned = new MyChromosome(getConfiguration(), new Object[] {});
+			for(int i=0;i<getGenes().length;i++)
+			{
+				cloned.setGene(i, getGene(i));
+			}
+			return cloned;
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
 	 * Constructor: takes as argument an array of Vehicles. Each one is an arraylist of customers.
+	 * @throws InvalidConfigurationException 
 	 */
-	public MyChromosome(Object[] veichles)
+	public MyChromosome(Configuration conf, Object[] veichles) throws InvalidConfigurationException
 	{
+		super(conf);
 		// Crea un array di dimensione maxCustomers+maxVeichles e riempilo con i risultati
-		this.genes = new MyIntGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
+		Gene[] genes = new MyIntGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
 		int k = 0;
 		for (int i=0;i<veichles.length;i++)
 		{
 			for (Integer customNumber : (ArrayList<Integer>)veichles[i])
 			{
-				genes[k] = new MyIntGene(customNumber);
+				genes[k] = new MyIntGene(conf,customNumber);
 				k++;
 			}
-			genes[k] = new MyIntGene(VEICHLE_MARKER);
+			genes[k] = new MyIntGene(conf,VEICHLE_MARKER);
 			k++;
 		}
+		
+		super.setGenes(genes);
 	}
 	
 	@Override
 	public String toString()
 	{
 		StringBuffer fb = new StringBuffer();
+		Gene[] genes = super.getGenes();
 		for(int i = 0; i < genes.length; i++)
 		{
 			int geneVal = (int)genes[i].getAllele();
@@ -204,71 +222,19 @@ public class MyChromosome implements IChromosome{
 		
 		return fb.toString();
 	}
-	
-	public static void main(String[] args) throws Exception
-	{
-		Parameters parameters = new Parameters();
-		
-		parameters.updateParameters(args);
-		if(parameters.getInputFileName() == null){
-			System.out.println("You must specify an input file name");
-			return;
-		}
-		Instance.setInstance(parameters);
-		Instance instance = Instance.getInstance();
-		instance.populateFromHombergFile(parameters.getInputFileName());
-		
-		// Genero una popolazione iniziale
-		Point2D depPos = new Point2D.Double(instance.getDepot(0).getXCoordinate(),instance.getDepot(0).getYCoordinate());
-		Date dti = new Date();
-		MyChromosome cw = generateInitialChromosome();
-		String res = cw.toString();
-		Date dte = new Date();
-		System.out.println("\nImpiegato: "+(dte.getTime()-dti.getTime())/1000d + " s");
-		System.out.println(res);
-		
-		//System.out.println(Accelerator.getInstance().getDistanceBetween(100,100));
-		System.out.println("Total len: "+GMObjectiveFunction.evaluate(cw));
-		
-	}
-		
-	
-	@Override
-	public int compareTo(Object o) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-	@Override
-	public String getUniqueID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getUniqueIDTemplate(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	@Override
-	public void setUniqueIDTemplate(String arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void cleanup() {
-		// TODO Auto-generated method stub
+		try {
+			super.setGenes(null);
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
-	@Override
-	public int getAge() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public Object getApplicationData() {
@@ -276,11 +242,6 @@ public class MyChromosome implements IChromosome{
 		return null;
 	}
 
-	@Override
-	public Configuration getConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public double getFitnessValue() {
@@ -288,36 +249,13 @@ public class MyChromosome implements IChromosome{
 		return 0;
 	}
 
+
 	@Override
 	public double getFitnessValueDirectly() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
-	public Gene getGene(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Gene[] getGenes() {
-		return this.genes;
-	}
-
-	@Override
-	public void increaseAge() {
-		throw new NotImplementedException();
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void increaseOperatedOn() {
-		throw new NotImplementedException();
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public boolean isSelectedForNextGeneration() {
@@ -325,80 +263,64 @@ public class MyChromosome implements IChromosome{
 		return false;
 	}
 
-	@Override
-	public int operatedOn() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void resetAge() {
-		throw new NotImplementedException();
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resetOperatedOn() {
-		throw new NotImplementedException();
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setAge(int arg0) {
-		throw new NotImplementedException();
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void setApplicationData(Object arg0) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
 		
 	}
+
 
 	@Override
 	public void setConstraintChecker(IGeneConstraintChecker arg0)
 			throws InvalidConfigurationException {
-		throw new NotImplementedException();
 		// TODO Auto-generated method stub
 		
 	}
 
+
 	@Override
 	public void setFitnessValue(double arg0) {
-		throw new NotImplementedException();
 		// TODO Auto-generated method stub
 		
 	}
+
 
 	@Override
 	public void setFitnessValueDirectly(double arg0) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
 		
 	}
 
-	@Override
-	public void setGenes(Gene[] arg0) throws InvalidConfigurationException {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
-		
-	}
 
 	@Override
 	public void setIsSelectedForNextGeneration(boolean arg0) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
 		
 	}
 
+
 	@Override
-	public int size() {
+	public int compareTo(Object o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
+	@Override
+	public boolean isHandlerFor(Object arg0, Class arg1) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public Object perform(Object arg0, Class arg1, Object arg2)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 	
 }

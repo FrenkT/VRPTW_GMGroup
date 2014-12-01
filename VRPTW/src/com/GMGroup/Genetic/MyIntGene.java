@@ -1,14 +1,17 @@
 package com.GMGroup.Genetic;
 
+import org.jgap.BaseGene;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IGeneConstraintChecker;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
+import org.jgap.impl.IntegerGene;
 
 import com.mdvrp.Instance;
 
-public class MyIntGene implements Gene{
+public class MyIntGene extends BaseGene {
 
 	/**
 	 * 
@@ -17,8 +20,9 @@ public class MyIntGene implements Gene{
 	private int customerOrDepotId;
 	//private UUID myId;
 	
-	public MyIntGene(int customerOrDepotId)
+	public MyIntGene(Configuration conf, int customerOrDepotId) throws InvalidConfigurationException
 	{
+		super(conf);
 		if (customerOrDepotId > Instance.getInstance().getCustomersNr())
 			throw new IllegalArgumentException("CustomerOrDepotId "+customerOrDepotId+" is not valid.");
 		
@@ -51,24 +55,6 @@ public class MyIntGene implements Gene{
 			throw new IllegalArgumentException("MyIntGene only supports equality comparision if compared to another MyIntGene");
 		}
 	}
-	
-	@Override
-	public String getUniqueID() {
-		//return myId.toString();
-		return null;
-	}
-
-	@Override
-	public String getUniqueIDTemplate(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setUniqueIDTemplate(String arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	//TODO
 	@Override
@@ -78,32 +64,10 @@ public class MyIntGene implements Gene{
 	}
 
 	@Override
-	public void cleanup() {
-		// Nothing to clean
-	}
-
-	@Override
 	public Object getAllele() {
 		return customerOrDepotId;
 	}
 
-	@Override
-	public Object getApplicationData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Configuration getConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public double getEnergy() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public String getPersistentRepresentation()
@@ -113,15 +77,14 @@ public class MyIntGene implements Gene{
 	}
 
 	@Override
-	public boolean isCompareApplicationData() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public Gene newGene() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return new MyIntGene(getConfiguration(), customerOrDepotId);
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -138,30 +101,6 @@ public class MyIntGene implements Gene{
 	}
 
 	@Override
-	public void setApplicationData(Object arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setCompareApplicationData(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setConstraintChecker(IGeneConstraintChecker arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setEnergy(double arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void setToRandomValue(RandomGenerator arg0) {
 		customerOrDepotId = arg0.nextInt(Instance.getInstance().getCustomersNr());
 	}
@@ -170,14 +109,20 @@ public class MyIntGene implements Gene{
 	public void setValueFromPersistentRepresentation(String arg0)
 			throws UnsupportedOperationException,
 			UnsupportedRepresentationException {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 		
 	}
 
+
 	@Override
-	public int size() {
+	protected Object getInternalValue() {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
+	}
+	
+	@Override
+	protected Gene newGeneInternal() {
+		return null;
 	}
 
 }
