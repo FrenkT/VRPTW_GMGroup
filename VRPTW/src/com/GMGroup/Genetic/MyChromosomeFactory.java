@@ -17,6 +17,9 @@ import java.util.Random;
 
 
 
+
+import java.util.UUID;
+
 import org.jgap.BaseChromosome;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -24,6 +27,7 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.IGeneConstraintChecker;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.impl.IntegerGene;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -36,7 +40,24 @@ import com.mdvrp.Vehicle;
 public class MyChromosomeFactory {
 
 	private static final boolean DEBUG = false;
-	public static final int VEICHLE_MARKER = 0;
+	private Gene[] genes;
+	private static MyChromosomeFactory instance;
+	private Random rnd;
+	
+	public static MyChromosomeFactory getInstance()
+	{
+		if (instance==null)
+			instance = new MyChromosomeFactory();
+		return instance;
+	}
+	
+	private MyChromosomeFactory()
+	{
+		genes = new IntegerGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
+		rnd= new Random((int)(UUID.randomUUID()).hashCode());
+	}
+	
+	//public static final int VEICHLE_MARKER = 0;
 	//private static MyChromosomeContraintChecker constraintChecker = new MyChromosomeContraintChecker();
 	/** 
 	 * 
@@ -44,9 +65,8 @@ public class MyChromosomeFactory {
 	 * @throws Exception 
 	 *  
 	 **/
-	public static IChromosome generateInitialChromosome(Configuration conf) throws Exception
+	public IChromosome generateInitialFeasibleChromosome(Configuration conf) throws Exception
 	{
-		Random rnd = new Random();
 		rnd.setSeed((new Date()).getTime());
 		Point2D depot = Accelerator.getInstance().getDepotLocaltion();
 		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
@@ -165,16 +185,19 @@ public class MyChromosomeFactory {
 		
 		toRemove.clear();
 		
-		Gene[] genes = new MyIntGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
+		
 		int k = 0;
 		for (int i=0;i<veichles.length;i++)
 		{
 			for (Integer customNumber : (ArrayList<Integer>)veichles[i])
 			{
-				genes[k] = new MyIntGene(conf,customNumber);
+				genes[k] = new IntegerGene(conf);
+				genes[k].setAllele(customNumber);
 				k++;
 			}
-			genes[k] = new MyIntGene(conf,VEICHLE_MARKER);
+			// Imposta un marker per il veicolo. Lo riconosciamo perchè negativo rispetto agli altri
+			genes[k] = new IntegerGene(conf);
+			genes[k].setAllele(-i);
 			k++;
 		}
 		veichles = null;
@@ -193,7 +216,7 @@ public class MyChromosomeFactory {
 		for(int i = 0; i < genes.length; i++)
 		{
 			int geneVal = (int)genes[i].getAllele();
-			if (geneVal==VEICHLE_MARKER)
+			if (geneVal<=0)
 				fb.append(" | ");
 			else
 				fb.append(" "+geneVal+" ");

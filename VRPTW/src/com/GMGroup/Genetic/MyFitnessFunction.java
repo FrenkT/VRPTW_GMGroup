@@ -12,8 +12,8 @@ public class MyFitnessFunction extends FitnessFunction {
 	protected double evaluate(IChromosome arg) {
 		
 		//MyChromosome chr = (MyChromosome)arg;
-		
-		return 1/GMObjectiveFunction.evaluate(arg);
+		double res = 1/GMObjectiveFunction.evaluate(arg);
+		return res;
 	}	
 	
 }

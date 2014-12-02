@@ -38,7 +38,7 @@ public class GMObjectiveFunction {
 		for (int i=0;i<(genes.length-1);i++)
 		{
 			// Case: double depot
-			if (genes[i].equals(genes[i+1]))
+			if (genes[i].equals(genes[i+1]) || ((int)genes[i].getAllele()<=0 && (int)genes[i+1].getAllele()<=0))
 				continue;
 			// Otherwise: calculate distance
 			totalLen+=acc.getDistanceBetween((int)genes[i].getAllele(), (int)genes[i+1].getAllele());

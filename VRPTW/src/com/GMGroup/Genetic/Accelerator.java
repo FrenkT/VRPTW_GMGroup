@@ -42,6 +42,11 @@ public class Accelerator {
 			precalculateDistances();
 		}
 		
+		if (idA<=0)
+			idA = 0;
+		if (idB <=0)
+			idB=0;
+		
 		return distances[idA][idB];
 		
 	}
