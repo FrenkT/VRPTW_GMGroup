@@ -46,6 +46,11 @@ public class Accelerator {
 		
 	}
 
+	public double getCustomerDemand(int customerIndex)
+	{
+		return customers[customerIndex].getCapacity();
+	}
+	
 	/**
 	 * Simply pre-caclulates distances among customers/depot. Those distances are stored within the accelerator and can be grabbed 
 	 * by using getDistanceBetween() method.

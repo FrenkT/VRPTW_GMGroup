@@ -14,7 +14,11 @@ import java.util.Random;
 
 
 
+
+
+
 import org.jgap.BaseChromosome;
+import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -27,19 +31,20 @@ import com.mdvrp.Customer;
 import com.mdvrp.Depot;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
+import com.mdvrp.Vehicle;
 
-public class MyChromosome extends BaseChromosome{
+public class MyChromosomeFactory {
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	public static final int VEICHLE_MARKER = 0;
-	
+	//private static MyChromosomeContraintChecker constraintChecker = new MyChromosomeContraintChecker();
 	/** 
 	 * 
 	 * Genera una soluzione iniziale in modo pseudo-randomico: al momento si rispettano tutti i constraints.
 	 * @throws Exception 
 	 *  
 	 **/
-	public static MyChromosome generateInitialChromosome(Configuration conf) throws Exception
+	public static IChromosome generateInitialChromosome(Configuration conf) throws Exception
 	{
 		Random rnd = new Random();
 		rnd.setSeed((new Date()).getTime());
@@ -160,36 +165,6 @@ public class MyChromosome extends BaseChromosome{
 		
 		toRemove.clear();
 		
-		// Costruisco l'oggetto chromosome a partire dai risultati ottenuti.
-		return new MyChromosome(conf,veichles);
-		
-	}
-	
-	
-	public Object clone()
-	{
-		try {
-			MyChromosome cloned = new MyChromosome(getConfiguration(), new Object[] {});
-			for(int i=0;i<getGenes().length;i++)
-			{
-				cloned.setGene(i, getGene(i));
-			}
-			return cloned;
-		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	/**
-	 * Constructor: takes as argument an array of Vehicles. Each one is an arraylist of customers.
-	 * @throws InvalidConfigurationException 
-	 */
-	public MyChromosome(Configuration conf, Object[] veichles) throws InvalidConfigurationException
-	{
-		super(conf);
-		// Crea un array di dimensione maxCustomers+maxVeichles e riempilo con i risultati
 		Gene[] genes = new MyIntGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
 		int k = 0;
 		for (int i=0;i<veichles.length;i++)
@@ -202,15 +177,19 @@ public class MyChromosome extends BaseChromosome{
 			genes[k] = new MyIntGene(conf,VEICHLE_MARKER);
 			k++;
 		}
+		veichles = null;
 		
-		super.setGenes(genes);
+		// Costruisco l'oggetto chromosome a partire dai risultati ottenuti.
+		Chromosome res = new Chromosome(conf,genes);
+		//res.setConstraintChecker(constraintChecker);
+		return res;
+		
 	}
 	
-	@Override
-	public String toString()
+	public static String PrintChromosome(IChromosome chromosome)
 	{
 		StringBuffer fb = new StringBuffer();
-		Gene[] genes = super.getGenes();
+		Gene[] genes = chromosome.getGenes();
 		for(int i = 0; i < genes.length; i++)
 		{
 			int geneVal = (int)genes[i].getAllele();
@@ -222,105 +201,6 @@ public class MyChromosome extends BaseChromosome{
 		
 		return fb.toString();
 	}
-
-
-	@Override
-	public void cleanup() {
-		try {
-			super.setGenes(null);
-		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-
-
-	@Override
-	public Object getApplicationData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public double getFitnessValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public double getFitnessValueDirectly() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public boolean isSelectedForNextGeneration() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public void setApplicationData(Object arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setConstraintChecker(IGeneConstraintChecker arg0)
-			throws InvalidConfigurationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setFitnessValue(double arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setFitnessValueDirectly(double arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setIsSelectedForNextGeneration(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public int compareTo(Object o) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public boolean isHandlerFor(Object arg0, Class arg1) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public Object perform(Object arg0, Class arg1, Object arg2)
-			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	
 }
