@@ -3,6 +3,9 @@ package com.GMGroup.Genetic;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import org.jgap.Chromosome;
+import org.jgap.IChromosome;
+
 import com.mdvrp.Customer;
 import com.mdvrp.Depot;
 
@@ -51,9 +54,19 @@ public class Accelerator {
 		
 	}
 
+	/**
+	 * Dato un ID utente, ritorna la sua DOMANDA. 
+	 * Nota che internamente la lista di utenti non contiene il depot. Quindi memorizziamo in posizione
+	 * 0 della lista il cliente con id 1.
+	 * @param customerIndex
+	 * @return
+	 */
 	public double getCustomerDemand(int customerIndex)
 	{
-		return customers[customerIndex].getCapacity();
+		if (customerIndex<0)
+			throw new IllegalArgumentException();
+
+		return customers[customerIndex-1].getCapacity();
 	}
 	
 	/**
@@ -127,6 +140,4 @@ public class Accelerator {
 	public double getDepotDueTime() {
 		return depot.getEndTw();
 	}
-	
-	
 }

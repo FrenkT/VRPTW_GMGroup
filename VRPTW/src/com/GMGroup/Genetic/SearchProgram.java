@@ -38,23 +38,19 @@ public class SearchProgram {
 		Configuration conf = new DefaultConfiguration();
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
-		conf.addGeneticOperator(new GreedyCrossover(conf));
-		/*
-		Gene[] sampleGenes = new Gene[instance.getCustomersNr()+instance.getVehiclesNr()];
-		for (int i=0; i<sampleGenes.length;i++)
-			sampleGenes[i]=new IntegerGene(conf,0, instance.getCustomersNr());
+		GreedyCrossover cop = new GreedyCrossover(conf);
+		cop.setStartOffset(0);
+		conf.addGeneticOperator(cop);
 		
-		conf.setSampleChromosome(new Chromosome(conf,sampleGenes));
-		conf.setPopulationSize(100);
-		
-		// Creating a population
-		Genotype population = Genotype.randomInitialGenotype(conf);
-		*/
+		//K_ChainMutationOperator cop2 = new K_ChainMutationOperator(conf);
+		//cop2.setMutationRate(4);
+		//conf.addGeneticOperator(cop2);
 		
 		IChromosome[] initialPop = new IChromosome[50];
 		for (int i=0;i<initialPop.length;i++)
 		{
 			initialPop[i]=MyChromosomeFactory.getInstance().generateInitialFeasibleChromosome(conf);
+			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
 		
 		conf.setSampleChromosome(initialPop[0]);
@@ -63,16 +59,14 @@ public class SearchProgram {
 		
 		
 		// Start alg
-		System.out.println("Current set: "+GMObjectiveFunction.evaluate(population.getFittestChromosome()));
-		population.evolve(100);
-		System.out.println("Current New set: "+GMObjectiveFunction.evaluate(population.getFittestChromosome()));
-		
+		population.evolve(10);
+		System.out.println("Current set: "+GMObjectiveFunction.evaluate(population.getFittestChromosome())+", Age: "+population.getFittestChromosome().getAge());
 		IChromosome bestSol = population.getFittestChromosome();
-		// Testing genetic alg.
 		
-		System.out.println("Best Solution found:");
-		System.out.println(MyChromosomeFactory.PrintChromosome(bestSol));
-		System.out.println("Legth: "+GMObjectiveFunction.evaluate(bestSol));
+		System.out.println("_________ XXX _________");
+		
+		for( IChromosome c : population.getPopulation().getChromosomes())
+			System.out.println("Age:"+c.getAge()+", Fitness: "+c.getFitnessValue()+","+MyChromosomeFactory.PrintChromosome(c));
 		
 	}
 	

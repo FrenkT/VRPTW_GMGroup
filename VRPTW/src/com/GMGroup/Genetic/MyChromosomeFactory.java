@@ -40,9 +40,10 @@ import com.mdvrp.Vehicle;
 public class MyChromosomeFactory {
 
 	private static final boolean DEBUG = false;
-	private Gene[] genes;
 	private static MyChromosomeFactory instance;
 	private Random rnd;
+	private double MAX_WAITABLE_TIME_RATIO = 0.2;
+	private double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
 	
 	public static MyChromosomeFactory getInstance()
 	{
@@ -53,7 +54,6 @@ public class MyChromosomeFactory {
 	
 	private MyChromosomeFactory()
 	{
-		genes = new IntegerGene[Instance.getInstance().getVehiclesNr() + Instance.getInstance().getCustomersNr()];
 		rnd= new Random((int)(UUID.randomUUID()).hashCode());
 	}
 	
@@ -67,7 +67,7 @@ public class MyChromosomeFactory {
 	 **/
 	public IChromosome generateInitialFeasibleChromosome(Configuration conf) throws Exception
 	{
-		rnd.setSeed((new Date()).getTime());
+		
 		Point2D depot = Accelerator.getInstance().getDepotLocaltion();
 		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
 		
@@ -104,6 +104,10 @@ public class MyChromosomeFactory {
 			System.out.println("Cliente #\tFROM\tTO\tDISTANCE\tElapsed\tService\tAttesa");
 		for (int i=0;i<maxVeichles && customers.size()>0;i++)
 		{
+			double maxWaitableInterval= Accelerator.getInstance().getDepotDueTime();
+			if (i<(maxVeichles/MAX_WAITING_VEHICLE_NUMBER_RATIO))
+				maxWaitableInterval *= MAX_WAITABLE_TIME_RATIO ;
+			
 			if (DEBUG)
 				System.out.println("============Veicolo "+i+" =============");
 			ArrayList<Integer> veichle = (ArrayList<Integer>)veichles[i];
@@ -156,8 +160,15 @@ public class MyChromosomeFactory {
 							System.out.println(toPrint);
 						if (timeToWait > 0) 
 						{
+							// Se il customer corrente richiede un'attesa maggiore della massima concepita, passa al prossimo
+							if (timeToWait > maxWaitableInterval)
+							{
+								if (DEBUG)
+									System.err.println("Veichle "+i+" can't wait for customer "+w+". Moving forward...");
+								continue;
+							}
 							// Siamo in attesa
-							elapsedTime += timeToWait;
+							elapsedTime += timeToWait;							
 						}
 						elapsedTime+=nextCustomer.getServiceDuration();
 						
@@ -175,6 +186,7 @@ public class MyChromosomeFactory {
 				}
 			}
 			customers.removeAll(toRemove);
+			toRemove.clear();
 		}
 		
 		if (customers.size()>0)
@@ -183,10 +195,11 @@ public class MyChromosomeFactory {
 			throw new Exception("Some customers haven't been assigned to any vehichle");
 		}
 		
-		toRemove.clear();
+		
 		
 		
 		int k = 0;
+		Gene[] genes = new IntegerGene[Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()];
 		for (int i=0;i<veichles.length;i++)
 		{
 			for (Integer customNumber : (ArrayList<Integer>)veichles[i])
