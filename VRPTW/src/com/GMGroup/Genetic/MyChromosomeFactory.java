@@ -196,10 +196,8 @@ public class MyChromosomeFactory {
 		}
 		
 		
-		
-		
 		int k = 0;
-		Gene[] genes = new IntegerGene[Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()];
+		Gene[] genes = new IntegerGene[Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()-1];
 		for (int i=0;i<veichles.length;i++)
 		{
 			for (Integer customNumber : (ArrayList<Integer>)veichles[i])
@@ -208,10 +206,13 @@ public class MyChromosomeFactory {
 				genes[k].setAllele(customNumber);
 				k++;
 			}
-			// Imposta un marker per il veicolo. Lo riconosciamo perchè negativo rispetto agli altri
-			genes[k] = new IntegerGene(conf);
-			genes[k].setAllele(-i);
-			k++;
+			if (i<(veichles.length-1))
+			{
+				// Imposta un marker per il veicolo. Lo riconosciamo perchè negativo rispetto agli altri
+				genes[k] = new IntegerGene(conf);
+				genes[k].setAllele(-i);
+				k++;
+			}
 		}
 		veichles = null;
 		

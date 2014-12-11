@@ -140,4 +140,8 @@ public class Accelerator {
 	public double getDepotDueTime() {
 		return depot.getEndTw();
 	}
+
+	public Customer getCustomer(int i) {
+		return customers[i-1];
+	}
 }

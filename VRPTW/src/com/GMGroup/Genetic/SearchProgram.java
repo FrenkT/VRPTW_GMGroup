@@ -1,6 +1,8 @@
 package com.GMGroup.Genetic;
 
 import java.awt.geom.Point2D;
+import java.io.FileWriter;
+import java.io.PrintStream;
 import java.util.Date;
 
 import org.jgap.Chromosome;
@@ -14,7 +16,12 @@ import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.GreedyCrossover;
 import org.jgap.impl.IntegerGene;
 
+import com.TabuSearch.MyMoveManager;
 import com.TabuSearch.MyObjectiveFunction;
+import com.TabuSearch.MySearchProgram;
+import com.TabuSearch.MySolution;
+import com.TabuSearch.MyTabuList;
+import com.mdvrp.Duration;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
@@ -22,7 +29,7 @@ public class SearchProgram {
 
 	public static void main(String[] args) throws Exception
 	{
-		// Parsing conf input file and populating Instance object
+		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
 		
 		parameters.updateParameters(args);
@@ -34,7 +41,7 @@ public class SearchProgram {
 		Instance instance = Instance.getInstance();
 		instance.populateFromHombergFile(parameters.getInputFileName());
 		
-		// Setting up jgap
+		// ***** Setting up jgap *****
 		Configuration conf = new DefaultConfiguration();
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
@@ -42,31 +49,25 @@ public class SearchProgram {
 		cop.setStartOffset(0);
 		conf.addGeneticOperator(cop);
 		
-		//K_ChainMutationOperator cop2 = new K_ChainMutationOperator(conf);
+		//KChainMutationOperator cop2 = new KChainMutationOperator(conf);
 		//cop2.setMutationRate(4);
 		//conf.addGeneticOperator(cop2);
 		
+		conf.addGeneticOperator(new TabuOperator(conf));
+		
+		// ***** Generating an initial population *****
 		IChromosome[] initialPop = new IChromosome[50];
 		for (int i=0;i<initialPop.length;i++)
 		{
 			initialPop[i]=MyChromosomeFactory.getInstance().generateInitialFeasibleChromosome(conf);
 			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
-		
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(50);
 		Genotype population = new Genotype(conf,initialPop);
 		
-		
 		// Start alg
-		population.evolve(10);
-		System.out.println("Current set: "+GMObjectiveFunction.evaluate(population.getFittestChromosome())+", Age: "+population.getFittestChromosome().getAge());
-		IChromosome bestSol = population.getFittestChromosome();
-		
-		System.out.println("_________ XXX _________");
-		
-		for( IChromosome c : population.getPopulation().getChromosomes())
-			System.out.println("Age:"+c.getAge()+", Fitness: "+c.getFitnessValue()+","+MyChromosomeFactory.PrintChromosome(c));
+		population.evolve(1);
 		
 	}
 	
