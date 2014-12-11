@@ -49,6 +49,7 @@ public class TabuOperator extends BaseGeneticOperator{
         PrintStream outPrintSream = null ;
 		// Create Tabu Search object
         
+        IChromosome[] offsprings = new IChromosome[a_population.size()];
         for (int k=0;k<a_population.size();k++)
         {
         	System.out.println("Starting tabu iteration # "+NumberOfIterations);
@@ -84,11 +85,14 @@ public class TabuOperator extends BaseGeneticOperator{
 	        System.out.println(outSol);
 	        System.out.println("Ended tabu iteration # "+NumberOfIterations);
 	        NumberOfIterations++;
-	        a_candidateChromosomes.add(solWrapper.toChromosome());
+	        offsprings[k]=solWrapper.toChromosome();
 	        //FileWriter fw = new FileWriter(parameters.getOutputFileName(),true);
 	        //fw.write(outSol);
 	        //fw.close();
         }
+        
+        for(IChromosome c : offsprings)
+        	a_candidateChromosomes.add(c);
         
 		
 	}

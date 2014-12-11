@@ -27,6 +27,8 @@ import com.mdvrp.Parameters;
 
 public class SearchProgram {
 
+	private static final int INITIAL_POPULATION_SIZE=50;
+	
 	public static void main(String[] args) throws Exception
 	{
 		// ***** Parsing conf input file and populating Instance object *****
@@ -45,9 +47,9 @@ public class SearchProgram {
 		Configuration conf = new DefaultConfiguration();
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
-		GreedyCrossover cop = new GreedyCrossover(conf);
-		cop.setStartOffset(0);
-		conf.addGeneticOperator(cop);
+		//GreedyCrossover cop = new GreedyCrossover(conf);
+		//cop.setStartOffset(0);
+		//conf.addGeneticOperator(cop);
 		
 		//KChainMutationOperator cop2 = new KChainMutationOperator(conf);
 		//cop2.setMutationRate(4);
@@ -56,16 +58,37 @@ public class SearchProgram {
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
 		// ***** Generating an initial population *****
-		IChromosome[] initialPop = new IChromosome[50];
+		IChromosome[] initialPop = new IChromosome[INITIAL_POPULATION_SIZE];
 		for (int i=0;i<initialPop.length;i++)
 		{
 			initialPop[i]=MyChromosomeFactory.getInstance().generateInitialFeasibleChromosome(conf);
 			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
 		conf.setSampleChromosome(initialPop[0]);
-		conf.setPopulationSize(50);
+		conf.setPopulationSize(INITIAL_POPULATION_SIZE);
 		Genotype population = new Genotype(conf,initialPop);
-		
+//		
+//		for(int i =0;i<population.getPopulation().size();i++)
+//		{
+//			IChromosome c = population.getPopulation().getChromosome(i);
+//			
+//			Gene[] g = c.getGenes();
+//			for(int j=0;j<g.length;j++)
+//			{
+//				Gene g1=g[j];
+//				for (int w=0;w<g.length;w++)
+//				{
+//					Gene g2=g[w];
+//					if ((int)g1.getAllele()==(int)g2.getAllele() && g1!=g2) // second is a reference equals
+//					{
+//						throw new Exception("Error!!!");
+//					}
+//				}
+//				
+//			}
+//			
+//		}
+//		
 		// Start alg
 		population.evolve(1);
 		
