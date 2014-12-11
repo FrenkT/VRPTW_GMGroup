@@ -29,7 +29,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	}
 
 	@Override
-	public void operate(Population a_population, List a_candidateChromosomes) {
+	public void operate(final Population a_population, List a_candidateChromosomes) {
 //		Duration duration = new Duration();
 //		duration.start();
 
