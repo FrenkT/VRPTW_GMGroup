@@ -20,6 +20,8 @@ import com.mdvrp.Parameters;
 
 public class TabuOperator extends BaseGeneticOperator{
 
+	private static int NumberOfIterations = 0;
+	
 	public TabuOperator(Configuration a_configuration)
 			throws InvalidConfigurationException {
 		super(a_configuration);
@@ -33,7 +35,6 @@ public class TabuOperator extends BaseGeneticOperator{
 
 		// TODO
 		// Should we apply the tabu to all the chromosomes of the population?
-		
 		Instance instance = Instance.getInstance();		
 		Parameters parameters = instance.getParameters();
 		// Init memory for Tabu Search
@@ -50,6 +51,7 @@ public class TabuOperator extends BaseGeneticOperator{
         
         for (int k=0;k<a_population.size();k++)
         {
+        	System.out.println("Starting tabu iteration # "+NumberOfIterations);
         	IChromosome c = a_population.getChromosome(k);
         	// Create a wrapper
         	MySolutionGMWrapper solWrapper = new MySolutionGMWrapper(c);
@@ -80,11 +82,14 @@ public class TabuOperator extends BaseGeneticOperator{
 	        		instance.getParameters().getInputFileName(), search.feasibleCost.total,
 	            	routesNr);
 	        System.out.println(outSol);
+	        System.out.println("Ended tabu iteration # "+NumberOfIterations);
+	        NumberOfIterations++;
 	        a_candidateChromosomes.add(solWrapper.toChromosome());
 	        //FileWriter fw = new FileWriter(parameters.getOutputFileName(),true);
 	        //fw.write(outSol);
 	        //fw.close();
         }
+        
 		
 	}
 
