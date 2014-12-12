@@ -25,7 +25,7 @@ public class MySearchProgram implements TabuSearchListener{
 	
 	public MySearchProgram(Instance instance, Solution initialSol, MoveManager moveManager, ObjectiveFunction objFunc, TabuList tabuList, boolean minmax, PrintStream outPrintStream)
 	{
-		tabuSearch = new MultiThreadedTabuSearch(initialSol, moveManager, objFunc,tabuList,	new BestEverAspirationCriteria(), minmax );
+		tabuSearch = new SingleThreadedTabuSearch(initialSol, moveManager, objFunc,tabuList,	new BestEverAspirationCriteria(), minmax );
 		feasibleIndex = -1;
 		bestIndex = 0;
 		this.instance = instance;

@@ -58,20 +58,13 @@ public class TabuOperator extends BaseGeneticOperator{
         	MySolutionGMWrapper solWrapper = new MySolutionGMWrapper(c);
 	        MySearchProgram search = new MySearchProgram(instance, solWrapper, moveManager,
 							            objFunc, tabuList, false,  outPrintSream);
+	        
 	        // Start solving        
 	        search.tabuSearch.setIterationsToGo(parameters.getIterations());
 	        search.tabuSearch.startSolving();
-	        
 	        // wait for the search thread to finish
-	        try {
-	        	// in order to apply wait on an object synchronization must be done
-	        	synchronized(instance){
-	        		instance.wait();
-	        	}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-	        
+	        // in order to apply wait on an object synchronization must be done
+        	
 	        // Count routes
 	        int routesNr = 0;
 	        for(int i =0; i < search.feasibleRoutes.length; ++i)
@@ -85,7 +78,15 @@ public class TabuOperator extends BaseGeneticOperator{
 	        System.out.println(outSol);
 	        System.out.println("Ended tabu iteration # "+NumberOfIterations);
 	        NumberOfIterations++;
-	        offsprings[k]=solWrapper.toChromosome();
+	        try {
+				offsprings[k]=solWrapper.toChromosome();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	        //FileWriter fw = new FileWriter(parameters.getOutputFileName(),true);
 	        //fw.write(outSol);
 	        //fw.close();

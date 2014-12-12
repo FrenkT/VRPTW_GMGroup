@@ -116,9 +116,11 @@ public class MySolutionGMWrapper extends MySolution {
 	 * this wrapper) is accordingly modified so that all the genes are reordered and then it is returned.
 	 * @param targetChromosome
 	 * @throws IllegalArgumentException
+	 * @throws InvalidConfigurationException 
 	 */
-	public IChromosome toChromosome() throws IllegalArgumentException
+	public IChromosome toChromosome() throws IllegalArgumentException, InvalidConfigurationException
 	{
+		/*
 		// By accessing the genes directly we will modify the chromosome itself. So be aware:
 		// we are changing the original chromosome => THIS IS A MUTATION!
 		Gene[] genes = chromosome.getGenes();
@@ -137,6 +139,38 @@ public class MySolutionGMWrapper extends MySolution {
 			if (i<(routes[0].length-1)) // Add the separator only if it's not the last vehicle
 			{
 				// When you reach this point, a vehicle-route has been scanned, so add a separator (<=0)
+				genes[geneCount].setAllele(-i);
+				geneCount++;
+			}
+		}
+		// Redundant, but clearer.
+		try {
+			chromosome.setGenes(genes);
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
+		*/
+		
+		//Gene[] genes = chromosome.getGenes();
+		Gene[] genes = new Gene[chromosome.size()];
+		// Start by looking at the routes
+		int geneCount = 0;
+		for (int i = 0; i < routes[0].length; i++)
+		{
+			Route r = routes[0][i];
+			List<Customer> customers = r.getCustomers();
+			for (int j=0;j<customers.size();j++)
+			{
+				Customer c = customers.get(j);
+				genes[geneCount] = new IntegerGene(chromosome.getConfiguration());
+				genes[geneCount].setAllele(c.getNumber()+1);
+						//.setAllele(c.getNumber()+1); // Check this!! //TODO //FIXME !!
+				geneCount++;
+			}
+			if (i<(routes[0].length-1)) // Add the separator only if it's not the last vehicle
+			{
+				// When you reach this point, a vehicle-route has been scanned, so add a separator (<=0)
+				genes[geneCount] = new IntegerGene(chromosome.getConfiguration());
 				genes[geneCount].setAllele(-i);
 				geneCount++;
 			}

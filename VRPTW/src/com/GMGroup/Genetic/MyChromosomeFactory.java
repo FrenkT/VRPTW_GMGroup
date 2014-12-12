@@ -27,6 +27,7 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.IGeneConstraintChecker;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.Population;
 import org.jgap.impl.IntegerGene;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -56,6 +57,23 @@ public class MyChromosomeFactory {
 	{
 		rnd= new Random((int)(UUID.randomUUID()).hashCode());
 	}
+	
+	public static double DEBUG_MEDIA_POPOLAZIONE(Population pop)
+	{
+		double media = 0;
+		int count = 0;
+		for (IChromosome cc : pop.getChromosomes())
+		{
+			for (org.jgap.Gene gg : cc.getGenes())
+			{
+				media+=(int)gg.getAllele();
+				count++;
+			}
+			
+		}
+		return media/count;
+	}
+	
 	
 	//public static final int VEICHLE_MARKER = 0;
 	//private static MyChromosomeContraintChecker constraintChecker = new MyChromosomeContraintChecker();

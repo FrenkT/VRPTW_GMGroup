@@ -27,7 +27,7 @@ import com.mdvrp.Parameters;
 
 public class SearchProgram {
 
-	private static final int INITIAL_POPULATION_SIZE=20;
+	private static final int INITIAL_POPULATION_SIZE=10;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -51,9 +51,9 @@ public class SearchProgram {
 		cop.setStartOffset(0);
 		conf.addGeneticOperator(cop);
 		
-		//KChainMutationOperator cop2 = new KChainMutationOperator(conf);
-		//cop2.setMutationRate(50);
-		//conf.addGeneticOperator(cop2);
+		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
+		cop2.setMutationRate(50);
+		conf.addGeneticOperator(cop2);
 		
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
@@ -69,7 +69,7 @@ public class SearchProgram {
 		Genotype population = new Genotype(conf,initialPop);
 
 		// Start alg
-		population.evolve(1);
+		population.evolve(20);
 		
 		
 		for(int i =0;i<population.getPopulation().size();i++)
