@@ -117,7 +117,7 @@ public class MyChromosomeFactory {
 			veichles[i]=new ArrayList<Integer>();
 		
 		ArrayList<Customer> toRemove = new ArrayList<Customer>();
-		// Per ogni veicolo, scegliamo un insieme di clienti da caricare fino a riempire le capacità e a rispettare le tw
+		// Per ogni veicolo, scegliamo un insieme di clienti da caricare fino a riempire le capacitï¿½ e a rispettare le tw
 		if (DEBUG)
 			System.out.println("Cliente #\tFROM\tTO\tDISTANCE\tElapsed\tService\tAttesa");
 		for (int i=0;i<maxVeichles && customers.size()>0;i++)
@@ -146,7 +146,7 @@ public class MyChromosomeFactory {
 				{
 					String toPrint = "";
 					
-					// Se è il primo customer, parti dal depot
+					// Se ï¿½ il primo customer, parti dal depot
 					if (veichle.size()==0)
 					{
 						// Calcolo distanza dal depot
@@ -226,7 +226,7 @@ public class MyChromosomeFactory {
 			}
 			if (i<(veichles.length-1))
 			{
-				// Imposta un marker per il veicolo. Lo riconosciamo perchè negativo rispetto agli altri
+				// Imposta un marker per il veicolo. Lo riconosciamo perchï¿½ negativo rispetto agli altri
 				genes[k] = new IntegerGene(conf);
 				genes[k].setAllele(-i);
 				k++;
@@ -262,7 +262,7 @@ public class MyChromosomeFactory {
 		Gene[] gens = chrom.getGenes(); 
 		Accelerator acc = Accelerator.getInstance();
 		double actualCost = 0;
-		// Controllo la capacità
+		// Controllo la capacita
 		for (int i = 0; i < gens.length; i++)
 		{
 			int idCustomerA = (int)gens[i].getAllele();

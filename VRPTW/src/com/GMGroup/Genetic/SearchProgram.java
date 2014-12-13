@@ -51,9 +51,9 @@ public class SearchProgram {
 		cop.setStartOffset(0);
 		conf.addGeneticOperator(cop);
 		
-		//KChainMutationOperator cop2 = new KChainMutationOperator(conf);
-		//cop2.setMutationRate(4);
-		//conf.addGeneticOperator(cop2);
+		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
+		cop2.setMutationRate(4);
+		conf.addGeneticOperator(cop2);
 		
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
