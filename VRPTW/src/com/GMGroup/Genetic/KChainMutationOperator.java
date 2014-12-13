@@ -16,11 +16,13 @@ import org.jgap.impl.SwappingMutationOperator;
 public class KChainMutationOperator extends SwappingMutationOperator{
 	
 	//default value= 0.04
+	/**
+	 * Expresses which divergence threshold
+	 */
 	private double parameter=0.015;
 
 	public KChainMutationOperator() throws InvalidConfigurationException {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public KChainMutationOperator(Configuration a_config,
@@ -176,13 +178,26 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	    return a_chrom;
 	}
 	
-	public double getParameter(){
-		return parameter;
-	}
-	
-	public void setParameter(double param){
-		this.parameter=param;
+	/**
+	 * Set the number of genes to be mutated into the chromosome. Param = 4 means 
+	 * 4 genes are going to be swapped.
+	 */
+	@Override
+	public void setMutationRate(int param){
+		super.setMutationRate(param);
 	}
 	
 
+	/**
+	 * Set the divergence parameter. This mutation will be applied
+	 * to all chromosomes which lies between +divergence and -divergence.
+	 * @param parameter
+	 */
+	public void setParameter(double parameter)
+	{
+		if (parameter<0 || parameter > 1)
+			throw new IllegalArgumentException("Invalid parameter specififed");
+		
+		this.parameter=parameter;
+	}
 }

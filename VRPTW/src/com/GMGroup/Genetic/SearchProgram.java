@@ -19,6 +19,10 @@ public class SearchProgram {
 	 */
 	public static final double CROSS_OVER_LIMIT_RATIO = 0.3;
 	
+	public static final double MUTATION_LIMIT_RATIO = 0.015;
+	
+	public static final int MUTATION_NUM_OF_GENES = 4;
+	
 	public static void main(String[] args) throws Exception
 	{
 		// ***** Parsing conf input file and populating Instance object *****
@@ -43,7 +47,8 @@ public class SearchProgram {
 		conf.addGeneticOperator(cop);
 		
 		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
-		cop2.setMutationRate(4);
+		cop2.setMutationRate(MUTATION_NUM_OF_GENES);
+		cop2.setParameter(MUTATION_LIMIT_RATIO);
 		conf.addGeneticOperator(cop2);
 		
 		conf.addGeneticOperator(new TabuOperator(conf));
