@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import com.GMGroup.Genetic.SearchProgram;
+import com.sun.org.apache.xml.internal.utils.StopParseException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,10 @@ import java.util.TimerTask;
 
 import javax.swing.JComboBox;
 
-public class MainFrame extends JFrame {
+import org.coinor.opents.TabuSearchEvent;
+import org.coinor.opents.TabuSearchListener;
+
+public class MainFrame extends JFrame implements TabuSearchListener{
 
 	private JPanel contentPane;
 	private JTextField populationSizeParam;
@@ -49,6 +53,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	private JLabel lblCurrentTopVal=null;
 	public MainFrame() {
 		setTitle("GiudaMorto UI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -94,23 +99,19 @@ public class MainFrame extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.WEST, lblCurrentTop, 0, SpringLayout.WEST, lblTimeElapsed);
 		contentPane.add(lblCurrentTop);
 		
-		JLabel lblCurrentTopVal = new JLabel("NA");
+		lblCurrentTopVal = new JLabel("NA");
 		sl_contentPane.putConstraint(SpringLayout.NORTH, lblCurrentTopVal, 6, SpringLayout.SOUTH, lblEvolveStatusValue);
 		sl_contentPane.putConstraint(SpringLayout.EAST, lblCurrentTopVal, 0, SpringLayout.EAST, lblElapsedTimeVal);
 		contentPane.add(lblCurrentTopVal);
 		
-		JButton btnStart = new JButton("Start");
+		final JButton btnStart = new JButton("Start");
 		
 		sl_contentPane.putConstraint(SpringLayout.WEST, btnStart, 46, SpringLayout.WEST, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.SOUTH, btnStart, -33, SpringLayout.SOUTH, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.EAST, btnStart, -31, SpringLayout.EAST, contentPane);
 		contentPane.add(btnStart);
 		
-		JButton btnStop = new JButton("Stop");
-		btnStop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
+		final JButton btnStop = new JButton("Stop");
 		sl_contentPane.putConstraint(SpringLayout.NORTH, btnStop, 6, SpringLayout.SOUTH, btnStart);
 		sl_contentPane.putConstraint(SpringLayout.WEST, btnStop, 0, SpringLayout.WEST, btnStart);
 		sl_contentPane.putConstraint(SpringLayout.EAST, btnStop, -31, SpringLayout.EAST, contentPane);
@@ -166,7 +167,6 @@ public class MainFrame extends JFrame {
 		
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				SearchProgram sp;
 				try {
 					int initialPopSize = Integer.parseInt(populationSizeParam.getText());
 					double cop=Double.parseDouble(crossOverParam.getText());
@@ -177,6 +177,7 @@ public class MainFrame extends JFrame {
 					sp.setCrossOverParam(cop);
 					sp.setMutationParam(mop);
 					
+					btnStart.setEnabled(false);
 					sp.start();
 					lblStartedAtValue.setText((new Date()).toLocaleString());
 					final long now = (new Date()).getTime()/1000;
@@ -194,6 +195,9 @@ public class MainFrame extends JFrame {
 							lblElapsedTimeVal.setText(hours+":"+min+":"+sec);
 						}
 					}, 0, 1000);
+					
+					
+					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -201,5 +205,57 @@ public class MainFrame extends JFrame {
 				
 			}
 		});
+		
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sp.stop();
+				btnStop.setEnabled(false);
+				btnStart.setEnabled(true);
+			}
+		});
+		
+	}
+
+	private SearchProgram sp = null;
+	
+	@Override
+	public void tabuSearchStarted(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tabuSearchStopped(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void newBestSolutionFound(TabuSearchEvent e) {
+		lblCurrentTopVal.setText(""+e.getTabuSearch().getBestSolution().getObjectiveValue()[0]);
+	}
+
+	@Override
+	public void newCurrentSolutionFound(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unimprovingMoveMade(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void improvingMoveMade(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void noChangeInValueMoveMade(TabuSearchEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

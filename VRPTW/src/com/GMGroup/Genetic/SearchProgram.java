@@ -6,7 +6,6 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
-
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
@@ -120,8 +119,6 @@ public class SearchProgram extends Thread{
 
 	public void setMutationParam(double mop) {
 		this.MUTATION_LIMIT_RATIO=mop;
-
-		
 	}
 	
 }
