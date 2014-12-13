@@ -78,16 +78,18 @@ public class SearchProgram {
 		c = population.getFittestChromosome();
 		res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population: "+res);
-//		for(int i =0;i<population.getPopulation().size();i++)
-//		{
-//			IChromosome c = population.getPopulation().getChromosome(i);
-//			
-//			for (Gene g : c.getGenes())
-//				System.out.print(g.getAllele()+";");
-//			
-//			System.out.println("");
-//			
-//		}
+		
+		for(int i =0;i<population.getPopulation().size();i++)
+		{
+			c = population.getPopulation().getChromosome(i);
+			System.out.print(MyChromosomeFactory.getIsChromosomeFeasible(c)+";");
+			System.out.print(GMObjectiveFunction.evaluate(c)+";");
+			for (Gene g : c.getGenes())
+				System.out.print(g.getAllele()+";");
+			
+			System.out.println("");
+			
+		}
 		
 		
 	}

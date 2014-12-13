@@ -257,5 +257,98 @@ public class MyChromosomeFactory {
 		return fb.toString();
 	}
 
+	public static boolean getIsChromosomeFeasible(IChromosome chrom)
+	{
+		Gene[] gens = chrom.getGenes(); 
+		Accelerator acc = Accelerator.getInstance();
+		double actualCost = 0;
+		// Controllo la capacità
+		for (int i = 0; i < gens.length; i++)
+		{
+			int idCustomerA = (int)gens[i].getAllele();
+			
+			if (idCustomerA <= 0 || i == (gens.length - 1))
+			{
+				if (i == (gens.length - 1) && idCustomerA > 0)
+				{
+					actualCost += acc.getCustomerDemand(idCustomerA);
+				}
+				// Ho raggiunto la fine di una route o la fine del cromosoma
+				// Controllo che fino ad ora non abbia sforato e resetto o ritorno false
+				if (actualCost > Instance.getInstance().getCapacity(0, 0))
+				{
+					return false;
+				}
+				
+				actualCost = 0;
+				continue;
+			}
+			
+			actualCost += acc.getCustomerDemand(idCustomerA);
+		}
+		
+		Point2D lastCustomerPosition = null;
+		Point2D depotPosition = Accelerator.getInstance().getDepotLocaltion();
+		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
+		double elapsedTime = 0;
+		double distanceOrTime = 0;
+		double timeToWait = 0;
+		int numVeicoli = 1;
+		// Controllo il rispetto delle time windows
+		for (int i = 0; i < gens.length; i++)
+		{
+			int idCustomer = (int)gens[i].getAllele();
+			//Customer idCustomer = customers.get(nextCustomerId);
+			//Instance.getInstance().getDepot(0).getAssignedcustomers()
+			
+			if (idCustomer <= 0 /*|| i == (gens.length - 1)*/)
+			{
+				numVeicoli++;
+				elapsedTime = 0;
+				lastCustomerPosition = null;
+				continue;
+			}
+			
+			Customer c = acc.getCustomer(idCustomer);
+			double serviceDuration = c.getServiceDuration();
+			
+			if (lastCustomerPosition == null)
+			{
+				lastCustomerPosition = new Point2D.Double(c.getXCoordinate(), c.getYCoordinate());
+				distanceOrTime = depotPosition.distance(lastCustomerPosition);
+			}
+			else
+			{
+				Point2D tmpPoint = new Point2D.Double(c.getXCoordinate(), c.getYCoordinate());
+				distanceOrTime = lastCustomerPosition.distance(tmpPoint);
+				lastCustomerPosition = tmpPoint;
+			}
+			
+			// Mettere il <= depotDueTime sia qui che sopra
+			if ((elapsedTime + distanceOrTime) <= c.getEndTw())
+			{	
+				timeToWait = c.getStartTw() - elapsedTime - distanceOrTime;
+				timeToWait = (timeToWait < 0) ?	0 : timeToWait;
+				
+				if ((elapsedTime + distanceOrTime + timeToWait + serviceDuration + depotPosition.distance(lastCustomerPosition)) < depotDueTime)
+				{
+					elapsedTime += distanceOrTime;
+					elapsedTime += timeToWait;
+					elapsedTime += serviceDuration;
+				}
+				else
+				{
+					return false;
+				}
+			
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
 	
 }
