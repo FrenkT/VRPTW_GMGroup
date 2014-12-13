@@ -47,13 +47,14 @@ public class TabuOperator extends BaseGeneticOperator{
         MyTabuList tabuList = new MyTabuList(parameters.getTabuTenure(), dimension);
         
         PrintStream outPrintSream = null ;
-		// Create Tabu Search object
-        
-        IChromosome[] offsprings = new IChromosome[a_population.size()];
-        for (int k=0;k<a_population.size();k++)
+		
+        // Apply the Tabu Search only to offsprings, do not touch parents
+        int startIndex = a_population.getConfiguration().getPopulationSize();
+        IChromosome[] offsprings = new IChromosome[a_candidateChromosomes.size()-startIndex];
+        for (int k=startIndex;k<a_candidateChromosomes.size();k++)
         {
         	System.out.println("Starting tabu iteration # "+NumberOfIterations);
-        	IChromosome c = a_population.getChromosome(k);
+        	IChromosome c = (IChromosome)a_candidateChromosomes.get(k);
         	// Create a wrapper
         	MySolutionGMWrapper solWrapper = new MySolutionGMWrapper(c);
 	        MySearchProgram search = new MySearchProgram(instance, solWrapper, moveManager,
@@ -62,9 +63,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	        // Start solving        
 	        search.tabuSearch.setIterationsToGo(parameters.getIterations());
 	        search.tabuSearch.startSolving();
-	        // wait for the search thread to finish
-	        // in order to apply wait on an object synchronization must be done
-        	
+	        
 	        // Count routes
 	        int routesNr = 0;
 	        for(int i =0; i < search.feasibleRoutes.length; ++i)
@@ -79,7 +78,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	        System.out.println("Ended tabu iteration # "+NumberOfIterations);
 	        NumberOfIterations++;
 	        try {
-				offsprings[k]=solWrapper.toChromosome();
+				offsprings[k-startIndex]=solWrapper.toChromosome();
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -87,15 +86,21 @@ public class TabuOperator extends BaseGeneticOperator{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        //FileWriter fw = new FileWriter(parameters.getOutputFileName(),true);
-	        //fw.write(outSol);
-	        //fw.close();
         }
         
-        for(IChromosome c : offsprings)
+        
+        // ----- SUBSISTUTE offsprings with tabu-searhed ones ------
+        // Swap old with new
+        int offChromIndex = 0;
+        for (int j=a_candidateChromosomes.size()-1;j>=startIndex;j--)
+        {
+        	a_candidateChromosomes.remove(j);
+        }
+        for (IChromosome c : offsprings)
         	a_candidateChromosomes.add(c);
         
-		
+        System.out.println("MARONNEEEE");
+        
 	}
 
 	@Override

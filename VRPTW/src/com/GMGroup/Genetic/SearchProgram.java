@@ -27,7 +27,7 @@ import com.mdvrp.Parameters;
 
 public class SearchProgram {
 
-	private static final int INITIAL_POPULATION_SIZE=10;
+	private static final int INITIAL_POPULATION_SIZE=50;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -51,9 +51,9 @@ public class SearchProgram {
 		cop.setStartOffset(0);
 		conf.addGeneticOperator(cop);
 		
-		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
-		cop2.setMutationRate(50);
-		conf.addGeneticOperator(cop2);
+		//KChainMutationOperator cop2 = new KChainMutationOperator(conf);
+		//cop2.setMutationRate(4);
+		//conf.addGeneticOperator(cop2);
 		
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
@@ -68,20 +68,26 @@ public class SearchProgram {
 		conf.setPopulationSize(INITIAL_POPULATION_SIZE);
 		Genotype population = new Genotype(conf,initialPop);
 
+		IChromosome c = population.getFittestChromosome();
+		double res = GMObjectiveFunction.evaluate(c);
+		System.out.println("Best of population Before EVOLVE: "+res);
+		
 		// Start alg
-		population.evolve(20);
+		population.evolve(3);
 		
-		
-		for(int i =0;i<population.getPopulation().size();i++)
-		{
-			IChromosome c = population.getPopulation().getChromosome(i);
-			
-			for (Gene g : c.getGenes())
-				System.out.print(g.getAllele()+";");
-			
-			System.out.println("");
-			
-		}
+		c = population.getFittestChromosome();
+		res = GMObjectiveFunction.evaluate(c);
+		System.out.println("Best of population: "+res);
+//		for(int i =0;i<population.getPopulation().size();i++)
+//		{
+//			IChromosome c = population.getPopulation().getChromosome(i);
+//			
+//			for (Gene g : c.getGenes())
+//				System.out.print(g.getAllele()+";");
+//			
+//			System.out.println("");
+//			
+//		}
 		
 		
 	}
