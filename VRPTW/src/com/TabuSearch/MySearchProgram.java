@@ -68,7 +68,7 @@ public class MySearchProgram implements TabuSearchListener{
 			feasibleRoutes = cloneRoutes(sol.getRoutes());
 			// set the new best to the current one
 			tabuSearch.setBestSolution(sol);
-			System.out.println("It " + tabuSearch.getIterationsCompleted() +" - New solution " + sol.getCost().total);
+			//System.out.println("It " + tabuSearch.getIterationsCompleted() +" - New solution " + sol.getCost().total);
 		}
 		
 		sol.updateParameters(sol.getObjectiveValue()[3], sol.getObjectiveValue()[4], sol.getObjectiveValue()[5]);

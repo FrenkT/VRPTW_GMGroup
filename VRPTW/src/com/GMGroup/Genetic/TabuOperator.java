@@ -97,10 +97,7 @@ public class TabuOperator extends BaseGeneticOperator{
         	a_candidateChromosomes.remove(j);
         }
         for (IChromosome c : offsprings)
-        	a_candidateChromosomes.add(c);
-        
-        System.out.println("MARONNEEEE");
-        
+        	a_candidateChromosomes.add(c);        
 	}
 
 	@Override

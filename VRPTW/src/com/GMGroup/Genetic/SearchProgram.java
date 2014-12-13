@@ -4,7 +4,9 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
+import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
@@ -35,6 +37,9 @@ public class SearchProgram {
 		
 		// ***** Setting up jgap *****
 		Configuration conf = new DefaultConfiguration();
+		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 0.90d);
+		bestChromsSelector.setDoubletteChromosomesAllowed(false);
+		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
 		MyGreedyCrossover cop = new MyGreedyCrossover(conf);
@@ -63,25 +68,29 @@ public class SearchProgram {
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
 		
-		// Start alg
 		population.evolve(3);
 		
 		c = population.getFittestChromosome();
 		res = GMObjectiveFunction.evaluate(c);
-		System.out.println("Best of population: "+res);
+		System.out.println("\nBest of population: "+res+"\n");
 		
-		for(int i =0;i<population.getPopulation().size();i++)
+		IChromosome best = population.getPopulation().getChromosome(0);
+		for(int i=0;i<population.getPopulation().size();i++)
 		{
 			c = population.getPopulation().getChromosome(i);
+			if (MyChromosomeFactory.getIsChromosomeFeasible(c)){
+				if (GMObjectiveFunction.evaluate(c) < GMObjectiveFunction.evaluate(best)){
+					best = c;
+				}
+			}
 			System.out.print(MyChromosomeFactory.getIsChromosomeFeasible(c)+";");
 			System.out.print(GMObjectiveFunction.evaluate(c)+";");
 			for (Gene g : c.getGenes())
 				System.out.print(g.getAllele()+";");
 			
-			System.out.println("");
-			
+			System.out.println("");	
 		}
-		
+		System.out.println("\nBest feasible solution: "+GMObjectiveFunction.evaluate(best));
 		
 	}
 	
