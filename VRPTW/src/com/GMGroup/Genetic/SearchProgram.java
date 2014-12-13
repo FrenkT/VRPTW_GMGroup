@@ -79,11 +79,15 @@ public class SearchProgram {
 		res = GMObjectiveFunction.evaluate(c);
 		System.out.println("\nBest of population: "+res+"\n");
 		
-		IChromosome best = population.getPopulation().getChromosome(0);
+		IChromosome best = null;
 		for(int i=0;i<population.getPopulation().size();i++)
 		{
 			c = population.getPopulation().getChromosome(i);
 			if (MyChromosomeFactory.getIsChromosomeFeasible(c)){
+				if (best == null){
+					best = c;
+				}
+				
 				if (GMObjectiveFunction.evaluate(c) < GMObjectiveFunction.evaluate(best)){
 					best = c;
 				}
