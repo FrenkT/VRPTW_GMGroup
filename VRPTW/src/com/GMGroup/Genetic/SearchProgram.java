@@ -1,33 +1,23 @@
 package com.GMGroup.Genetic;
 
-import java.awt.geom.Point2D;
-import java.io.FileWriter;
-import java.io.PrintStream;
-import java.util.Date;
-
-import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
-import org.jgap.Population;
-import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.GreedyCrossover;
-import org.jgap.impl.IntegerGene;
-
-import com.TabuSearch.MyMoveManager;
-import com.TabuSearch.MyObjectiveFunction;
-import com.TabuSearch.MySearchProgram;
-import com.TabuSearch.MySolution;
-import com.TabuSearch.MyTabuList;
-import com.mdvrp.Duration;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
 public class SearchProgram {
 
-	private static final int INITIAL_POPULATION_SIZE=50;
+	public static final int INITIAL_POPULATION_SIZE=50;
+	
+	/**
+	 * Makes the crossover operator to operate on a limited number of parents.
+	 * If INITIAL_SIZE_POPULATION is 90, there will be 90 * CROSS_OVER_RATIO 
+	 * crossovers.
+	 */
+	public static final double CROSS_OVER_LIMIT_RATIO = 0.3;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -47,8 +37,9 @@ public class SearchProgram {
 		Configuration conf = new DefaultConfiguration();
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
-		GreedyCrossover cop = new GreedyCrossover(conf);
+		MyGreedyCrossover cop = new MyGreedyCrossover(conf);
 		cop.setStartOffset(0);
+		cop.setRate(CROSS_OVER_LIMIT_RATIO);
 		conf.addGeneticOperator(cop);
 		
 		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
