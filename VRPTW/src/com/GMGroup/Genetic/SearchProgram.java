@@ -1,34 +1,36 @@
 package com.GMGroup.Genetic;
 
+import javax.swing.JTextField;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.DefaultConfiguration;
+
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
-public class SearchProgram {
+public class SearchProgram extends Thread{
 
-	public static final int INITIAL_POPULATION_SIZE=50;
+	public static int INITIAL_POPULATION_SIZE=50;
 	
 	/**
 	 * Makes the crossover operator to operate on a limited number of parents.
 	 * If INITIAL_SIZE_POPULATION is 90, there will be 90 * CROSS_OVER_RATIO 
 	 * crossovers.
 	 */
-	public static final double CROSS_OVER_LIMIT_RATIO = 0.3;
+	public static double CROSS_OVER_LIMIT_RATIO = 0.3;
 	
-	public static final double MUTATION_LIMIT_RATIO = 0.015;
+	public static double MUTATION_LIMIT_RATIO = 0.005;
 	
-	public static final int MUTATION_NUM_OF_GENES = 4;
+	public static int MUTATION_NUM_OF_GENES = 4;
 	
-	public static void main(String[] args) throws Exception
+	public SearchProgram(String fileName) throws Exception
 	{
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
-		
-		parameters.updateParameters(args);
+		parameters.updateParameters(new String[]{"-if",fileName});
 		if(parameters.getInputFileName() == null){
 			System.out.println("You must specify an input file name");
 			return;
@@ -62,8 +64,14 @@ public class SearchProgram {
 		}
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(INITIAL_POPULATION_SIZE);
-		Genotype population = new Genotype(conf,initialPop);
-
+		population = new Genotype(conf,initialPop);
+		
+	}
+	Genotype population = null;
+	
+	@Override
+	public void run()
+	{
 		IChromosome c = population.getFittestChromosome();
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
@@ -86,8 +94,20 @@ public class SearchProgram {
 			System.out.println("");
 			
 		}
+	}
+
+	public void setInitialPopulationSize(int initialPopSize) {
+		this.INITIAL_POPULATION_SIZE = initialPopSize;
+	}
+
+	public void setCrossOverParam(double crossOverParam) {
+	
+		this.CROSS_OVER_LIMIT_RATIO = crossOverParam;
 		
-		
+	}
+
+	public void setMutationParam(double mop) {
+		this.MUTATION_LIMIT_RATIO=mop;
 	}
 	
 }
