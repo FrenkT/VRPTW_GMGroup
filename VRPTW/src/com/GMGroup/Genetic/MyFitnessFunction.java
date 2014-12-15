@@ -23,7 +23,7 @@ public class MyFitnessFunction extends FitnessFunction {
 		viol = MyChromosomeFactory.getEntitiesOfViolations(arg);
 		result = GMObjectiveFunction.evaluate(arg);
 		result += (CapacityPenalty * viol[1] * viol[0]);
-		result += (TimeWPenalty * viol[3] * viol[2] * ((viol[4] - viol[2] == 0) ? 1 : viol[4] - viol[2]));
+		result += (TimeWPenalty * viol[3] * viol[2] * (viol[4] - viol[2] + 1));
 		return 1 / result;
 		/*
 		Gene[] gens = arg.getGenes(); 
