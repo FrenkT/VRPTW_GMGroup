@@ -33,10 +33,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
-//		Duration duration = new Duration();
-//		duration.start();
 
-		// TODO
 		// Should we apply the tabu to all the chromosomes of the population?
 		Instance instance = Instance.getInstance();		
 		Parameters parameters = instance.getParameters();
@@ -66,8 +63,9 @@ public class TabuOperator extends BaseGeneticOperator{
 							            objFunc, tabuList, false,  outPrintSream);
 	        
 	        // Start solving        
-	        search.tabuSearch.setIterationsToGo(parameters.getIterations());
-	        search.tabuSearch.startSolving();
+        	search.tabuSearch.setIterationsToGo(parameters.getIterations());
+    		search.tabuSearch.startSolving();
+
 	        // Count routes
 	        int routesNr = 0;
 	        for(int i =0; i < search.feasibleRoutes.length; ++i)
@@ -83,9 +81,8 @@ public class TabuOperator extends BaseGeneticOperator{
 	        NumberOfIterations++;
 	        try {
 	        	offsprings[k-startIndex]=((MySolutionGMWrapper)search.tabuSearch.getBestSolution()).toChromosome();
-	        	double test = search.tabuSearch.getBestSolution().getObjectiveValue()[0];
-	        	GMObjectiveFunction.evaluate(offsprings[k-startIndex]);//TODO : Mostrare agli altri cosa ho corretto: bestSolution!=actualsolution (solwrapper)
-	        	System.out.println(test);
+	        	a_candidateChromosomes.remove(k);
+	        	a_candidateChromosomes.add(k,offsprings[k-startIndex]);
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -95,15 +92,14 @@ public class TabuOperator extends BaseGeneticOperator{
 			}
         }
         
-        
         // ----- SUBSISTUTE offsprings with tabu-searhed ones ------
         // Swap old with new
-        for (int j=a_candidateChromosomes.size()-1;j>=startIndex;j--)
-        {
-        	a_candidateChromosomes.remove(j);
-        }
-        for (IChromosome c : offsprings)
-        	a_candidateChromosomes.add(c);        
+        //for (int j=a_candidateChromosomes.size()-1;j>=startIndex;j--)
+        //{
+        //	a_candidateChromosomes.remove(j);
+        //}
+        //for (IChromosome c : offsprings)
+        //	a_candidateChromosomes.add(c);        
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -49,6 +50,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JScrollPane;
 
 import java.awt.Color;
+
 import javax.swing.border.LineBorder;
 
 public class MainFrame extends JFrame implements TabuSearchListener{
@@ -60,6 +62,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private JComboBox<String> cbFileList;
 	
 	private static MainFrame instance;
+	
+	public static final int MAX_TIMEOUT = 300000;
 	
 	public static MainFrame getInstance()
 	{
@@ -244,9 +248,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 				}
 				else
 				{
-					sp.stop();
-					btnStop.setEnabled(false);
-					btnStart.setEnabled(true);
+					sp.halt();
 				}
 			}
 		});
@@ -265,25 +267,36 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					sp.setMutationParam(mop);
 					
 					btnStart.setEnabled(false);
+					btnStop.setEnabled(true);
+					
+					sp.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+						@Override
+						public void uncaughtException(Thread t, Throwable e) {
+							btnStop.setEnabled(false);
+							btnStart.setEnabled(true);
+							//e.printStackTrace(System.err);
+							sp.PrintStatus();
+						}
+					});
+					
 					sp.start();
 					lblStartedAtValue.setText((new Date()).toLocaleString());
 					final long now = (new Date()).getTime()/1000;
-					Timer t = new Timer();
-					t.schedule(new TimerTask() {
-						
+					final Timer t = new Timer();
+					t.schedule(new ClockUpdater(now,lblElapsedTimeVal), 0, 1000);
+					
+					// Stop this Thread after 5 minutes
+					Timer gameOver = new Timer();
+					gameOver.schedule(new TimerTask(){
+
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
-							long n = (new Date()).getTime()/1000;
-							long span = (n-now);
-							int hours = (int)span/3600;
-							int min = (int) ((span % 3600)/60);
-							int sec = (int) ((span % 3600)%60);
-							lblElapsedTimeVal.setText(hours+":"+min+":"+sec);
+							sp.halt();
+							t.cancel();
 						}
-					}, 0, 1000);
-					
-					
+						
+					}, MAX_TIMEOUT); // Stop after 
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -292,7 +305,9 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 				}
 				
 			}
-		});		
+		});	
+		
+		
 	}
 
 	private SearchProgram sp = null;

@@ -8,14 +8,19 @@ import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
 
+import sun.java2d.pipe.SpanClipRenderer;
+
 import com.GMGroup.GeneticUI.MainFrame;
+import com.TabuSearch.MySearchProgram;
+import com.TabuSearch.MySolution;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
 public class SearchProgram extends Thread{
 
 	public static int INITIAL_POPULATION_SIZE=50;
-	
+	public static int MAX_EVOLVE_GENERATIONS=30;
+	private boolean stopped=false;
 	/**
 	 * Makes the crossover operator to operate on a limited number of parents.
 	 * If INITIAL_SIZE_POPULATION is 90, there will be 90 * CROSS_OVER_RATIO 
@@ -29,6 +34,7 @@ public class SearchProgram extends Thread{
 	
 	public SearchProgram(String fileName) throws Exception
 	{
+		stopped=false;
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
 		parameters.updateParameters(new String[]{"-if",fileName});
@@ -89,18 +95,26 @@ public class SearchProgram extends Thread{
 		
 	}
 	Genotype population = null;
-	
 	@Override
 	public void run()
 	{
+		if (stopped)
+			System.err.println("Cannot start a thread which has been previously stopped.");
+		
 		IChromosome c = population.getFittestChromosome();
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
 		
-		population.evolve(10);
+		population.evolve(MAX_EVOLVE_GENERATIONS);
 		
-		c = population.getFittestChromosome();
-		res = GMObjectiveFunction.evaluate(c);
+		PrintStatus();
+	}
+
+	public void PrintStatus()
+	{
+
+		IChromosome c = population.getFittestChromosome();
+		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("\nBest of population: "+res+"\n");
 		
 		IChromosome best = null;
@@ -123,7 +137,11 @@ public class SearchProgram extends Thread{
 			
 			System.out.println("");	
 		}
-		System.out.println("\nBest feasible solution: "+GMObjectiveFunction.evaluate(best));
+		
+		if (best==null)
+			best=population.getFittestChromosome();
+		
+		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
 	}
 
 	public void setInitialPopulationSize(int initialPopSize) {
@@ -138,6 +156,13 @@ public class SearchProgram extends Thread{
 
 	public void setMutationParam(double mop) {
 		this.MUTATION_LIMIT_RATIO=mop;
+	}
+
+	
+	public void halt() {
+		// TODO Auto-generated method stub
+		stopped = true;
+		this.stop();
 	}
 	
 }

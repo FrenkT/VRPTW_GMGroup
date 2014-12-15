@@ -773,24 +773,31 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
         // While not canceled and iterations left to go
         while( keepSolving && ( iterationsToGo > 0 ) )
         {   
-            Thread.yield();       
-            synchronized( this )
+            Thread.yield();  
+            try {
+	            synchronized( this )
+	            {
+	                iterationsToGo--;
+	                
+	                try
+	                {   performOneIteration();
+	                }   // end try
+	                catch( NoMovesGeneratedException e )
+	                {   if( err != null )
+	                        err.println( e );
+	                }   // end catch
+	                catch( NoCurrentSolutionException e )
+	                {   if( err != null )
+	                        err.println( e );
+	                }   // end catch
+	                incrementIterationsCompleted();
+	            }   // end sync: this
+            }
+            catch (Exception ex)
             {
-                iterationsToGo--;
-                
-                try
-                {   performOneIteration();
-                }   // end try
-                catch( NoMovesGeneratedException e )
-                {   if( err != null )
-                        err.println( e );
-                }   // end catch
-                catch( NoCurrentSolutionException e )
-                {   if( err != null )
-                        err.println( e );
-                }   // end catch
-                incrementIterationsCompleted();
-            }   // end sync: this
+            	ex.printStackTrace();
+            	//throw new InterruptedException("ex");
+            }
         }   // end while: iters left
         
         setSolving( false );
