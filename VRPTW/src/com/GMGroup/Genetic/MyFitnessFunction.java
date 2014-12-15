@@ -6,8 +6,8 @@ import org.jgap.IChromosome;
 
 public class MyFitnessFunction extends FitnessFunction {
 
-	public final static double Capacitypenalty = 50; // TODO
-	public final static double TimeWpenalty = 5;
+	public final static double CapacityPenalty = 50; // TODO
+	public final static double TimeWPenalty = 5;
 	
 	
 	/**
@@ -18,13 +18,13 @@ public class MyFitnessFunction extends FitnessFunction {
 	 */
 	@Override
 	protected double evaluate(IChromosome arg) {
-		double result=0;
+		double result = 0;
 		double[] viol;
-		viol=MyChromosomeFactory.getEntitiesOfViolations(arg);
-		result=GMObjectiveFunction.evaluate(arg);
-		result+=(Capacitypenalty*viol[1]);
-		result+=(TimeWpenalty*viol[3]);
-		return 1/result;
+		viol = MyChromosomeFactory.getEntitiesOfViolations(arg);
+		result = GMObjectiveFunction.evaluate(arg);
+		result += (CapacityPenalty * viol[1] * viol[0]);
+		result += (TimeWPenalty * viol[3] * viol[2] * ((viol[4] - viol[2] == 0) ? 1 : viol[4] - viol[2]));
+		return 1 / result;
 		/*
 		Gene[] gens = arg.getGenes(); 
 		Accelerator acc = Accelerator.getInstance();
@@ -67,6 +67,4 @@ public class MyFitnessFunction extends FitnessFunction {
 		return res;
 		*/
 	}	
-	
-	
 }

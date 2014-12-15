@@ -275,7 +275,7 @@ public class MyChromosomeFactory {
 			{
 				System.err.println("Unassigned "+customers.size());
 				System.err.println("Aborting this chromosome.");
-				throw new Exception("Some customers haven't been assigned to any vehichle");
+				throw new IncompleteSolutionException("Some customers haven't been assigned to any vehichle");
 			}
 		}
 		
