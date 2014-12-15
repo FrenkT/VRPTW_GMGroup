@@ -98,7 +98,7 @@ public class Accelerator {
 				Point2D to = null;
 				// Prima iterazione: calcola la distanza tra depot e customers
 				if (i==j)
-					distances[i][j]=Double.MAX_VALUE;
+					distances[i][j]=0;
 				else if (j==0)
 				{
 					to = depot.getLocation();

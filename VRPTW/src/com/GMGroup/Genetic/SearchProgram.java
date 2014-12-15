@@ -6,6 +6,8 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
+import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
@@ -38,6 +40,7 @@ public class SearchProgram extends Thread{
 		instance.populateFromHombergFile(parameters.getInputFileName());
 		
 		// ***** Setting up jgap *****
+		Configuration.reset();
 		Configuration conf = new DefaultConfiguration();
 		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 0.90d);
 		bestChromsSelector.setDoubletteChromosomesAllowed(false);
@@ -54,7 +57,7 @@ public class SearchProgram extends Thread{
 		cop2.setParameter(MUTATION_LIMIT_RATIO);
 		conf.addGeneticOperator(cop2);
 		
-		conf.addGeneticOperator(new TabuOperator(conf));
+		conf.addGeneticOperator(new TabuOperator(conf,MainFrame.getInstance()));
 		
 		// ***** Generating an initial population *****
 		IChromosome[] initialPop = new IChromosome[INITIAL_POPULATION_SIZE];

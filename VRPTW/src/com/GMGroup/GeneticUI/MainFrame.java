@@ -2,14 +2,22 @@ package com.GMGroup.GeneticUI;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.ComboBoxUI;
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SpringLayout;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.GMGroup.Genetic.SearchProgram;
 import com.sun.org.apache.xml.internal.utils.StopParseException;
@@ -17,6 +25,10 @@ import com.sun.org.apache.xml.internal.utils.StopParseException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -27,22 +39,47 @@ import javax.swing.JComboBox;
 import org.coinor.opents.TabuSearchEvent;
 import org.coinor.opents.TabuSearchListener;
 
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.JSplitPane;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JEditorPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JScrollPane;
+
+import java.awt.Color;
+import javax.swing.border.LineBorder;
+
 public class MainFrame extends JFrame implements TabuSearchListener{
 
 	private JPanel contentPane;
 	private JTextField populationSizeParam;
 	private JTextField crossOverParam;
 	private JTextField mutationParam;
-
+	private JComboBox<String> cbFileList;
+	
+	private static MainFrame instance;
+	
+	public static MainFrame getInstance()
+	{
+		return instance;
+	}
+	
 	/**
 	 * Launch the application.
+	 * @throws UnsupportedLookAndFeelException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainFrame frame = new MainFrame();
-					frame.setVisible(true);
+					instance= new MainFrame();
+					instance.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -57,114 +94,164 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	public MainFrame() {
 		setTitle("GiudaMorto UI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 274, 321);
+		setBounds(100, 100, 254, 331);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		SpringLayout sl_contentPane = new SpringLayout();
-		contentPane.setLayout(sl_contentPane);
 		
 		JLabel lblTimeElapsed = new JLabel("Time elapsed:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblTimeElapsed, 10, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblTimeElapsed, 10, SpringLayout.WEST, contentPane);
-		contentPane.add(lblTimeElapsed);
 		
 		final JLabel lblElapsedTimeVal = new JLabel("NA");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblElapsedTimeVal, 0, SpringLayout.NORTH, lblTimeElapsed);
-		sl_contentPane.putConstraint(SpringLayout.EAST, lblElapsedTimeVal, -10, SpringLayout.EAST, contentPane);
-		contentPane.add(lblElapsedTimeVal);
 		
 		JLabel lblNewLabel_1 = new JLabel("Started At:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblNewLabel_1, 6, SpringLayout.SOUTH, lblTimeElapsed);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblNewLabel_1, 10, SpringLayout.WEST, contentPane);
-		contentPane.add(lblNewLabel_1);
 		
 		final JLabel lblStartedAtValue = new JLabel("NA");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblStartedAtValue, 6, SpringLayout.SOUTH, lblElapsedTimeVal);
-		sl_contentPane.putConstraint(SpringLayout.EAST, lblStartedAtValue, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(lblStartedAtValue);
 		
 		JLabel lblEvolveStatus = new JLabel("Evolve Status:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblEvolveStatus, 6, SpringLayout.SOUTH, lblNewLabel_1);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblEvolveStatus, 0, SpringLayout.WEST, lblTimeElapsed);
-		contentPane.add(lblEvolveStatus);
 		
 		JLabel lblEvolveStatusValue = new JLabel("NA");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblEvolveStatusValue, 6, SpringLayout.SOUTH, lblStartedAtValue);
-		sl_contentPane.putConstraint(SpringLayout.EAST, lblEvolveStatusValue, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(lblEvolveStatusValue);
 		
 		JLabel lblCurrentTop = new JLabel("Current TOP:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblCurrentTop, 6, SpringLayout.SOUTH, lblEvolveStatus);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblCurrentTop, 0, SpringLayout.WEST, lblTimeElapsed);
-		contentPane.add(lblCurrentTop);
 		
 		lblCurrentTopVal = new JLabel("NA");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblCurrentTopVal, 6, SpringLayout.SOUTH, lblEvolveStatusValue);
-		sl_contentPane.putConstraint(SpringLayout.EAST, lblCurrentTopVal, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(lblCurrentTopVal);
-		
-		final JButton btnStart = new JButton("Start");
-		
-		sl_contentPane.putConstraint(SpringLayout.WEST, btnStart, 46, SpringLayout.WEST, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.SOUTH, btnStart, -33, SpringLayout.SOUTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.EAST, btnStart, -31, SpringLayout.EAST, contentPane);
-		contentPane.add(btnStart);
-		
-		final JButton btnStop = new JButton("Stop");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, btnStop, 6, SpringLayout.SOUTH, btnStart);
-		sl_contentPane.putConstraint(SpringLayout.WEST, btnStop, 0, SpringLayout.WEST, btnStart);
-		sl_contentPane.putConstraint(SpringLayout.EAST, btnStop, -31, SpringLayout.EAST, contentPane);
-		contentPane.add(btnStop);
-		
-		final JComboBox cbFileList = new JComboBox();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, cbFileList, 6, SpringLayout.SOUTH, lblCurrentTop);
-		sl_contentPane.putConstraint(SpringLayout.WEST, cbFileList, 0, SpringLayout.WEST, lblTimeElapsed);
-		sl_contentPane.putConstraint(SpringLayout.EAST, cbFileList, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(cbFileList);
 		
 		JLabel lblCrossoverParam = new JLabel("Population Size:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblCrossoverParam, 6, SpringLayout.SOUTH, cbFileList);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblCrossoverParam, 10, SpringLayout.WEST, contentPane);
-		contentPane.add(lblCrossoverParam);
 		
 		JLabel label = new JLabel("CrossOver Param:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, label, 6, SpringLayout.SOUTH, lblCrossoverParam);
-		sl_contentPane.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, lblTimeElapsed);
-		contentPane.add(label);
 		
 		JLabel lblMutationparam = new JLabel("MutationParam:");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblMutationparam, 6, SpringLayout.SOUTH, label);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblMutationparam, 0, SpringLayout.WEST, lblTimeElapsed);
-		contentPane.add(lblMutationparam);
 		
 		populationSizeParam = new JTextField();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, populationSizeParam, 6, SpringLayout.SOUTH, cbFileList);
-		sl_contentPane.putConstraint(SpringLayout.EAST, populationSizeParam, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(populationSizeParam);
 		populationSizeParam.setColumns(10);
 		
 		crossOverParam = new JTextField();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, crossOverParam, 0, SpringLayout.NORTH, label);
-		sl_contentPane.putConstraint(SpringLayout.WEST, crossOverParam, 0, SpringLayout.WEST, populationSizeParam);
-		contentPane.add(crossOverParam);
 		crossOverParam.setColumns(10);
 		
 		mutationParam = new JTextField();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, mutationParam, 0, SpringLayout.NORTH, lblMutationparam);
-		sl_contentPane.putConstraint(SpringLayout.EAST, mutationParam, 0, SpringLayout.EAST, lblElapsedTimeVal);
-		contentPane.add(mutationParam);
 		mutationParam.setColumns(10);
+		
+		populationSizeParam.setText(""+SearchProgram.INITIAL_POPULATION_SIZE);
+		crossOverParam.setText(""+SearchProgram.CROSS_OVER_LIMIT_RATIO);
+		mutationParam.setText(""+SearchProgram.MUTATION_LIMIT_RATIO);
+		
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		
+		final JButton btnStart = new JButton("Start");
+		splitPane.setLeftComponent(btnStart);
+		
+		final JButton btnStop = new JButton("Stop");
+		splitPane.setRightComponent(btnStop);
+		
+		cbFileList = new JComboBox();
+			
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(10)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblTimeElapsed)
+									.addGap(121)
+									.addComponent(lblElapsedTimeVal))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblNewLabel_1)
+									.addGap(133)
+									.addComponent(lblStartedAtValue))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblEvolveStatus)
+									.addGap(117)
+									.addComponent(lblEvolveStatusValue))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblCurrentTop)
+									.addGap(123)
+									.addComponent(lblCurrentTopVal))
+								.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblCrossoverParam)
+									.addGap(39)
+									.addComponent(populationSizeParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(label)
+									.addGap(27)
+									.addComponent(crossOverParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblMutationparam)
+									.addGap(39)
+									.addComponent(mutationParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(673, Short.MAX_VALUE))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(19)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblTimeElapsed)
+						.addComponent(lblElapsedTimeVal))
+					.addGap(6)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblNewLabel_1)
+						.addComponent(lblStartedAtValue))
+					.addGap(6)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblEvolveStatus)
+						.addComponent(lblEvolveStatusValue))
+					.addGap(6)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblCurrentTop)
+						.addComponent(lblCurrentTopVal))
+					.addGap(6)
+					.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(5)
+							.addComponent(lblCrossoverParam))
+						.addComponent(populationSizeParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(2)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(3)
+							.addComponent(label))
+						.addComponent(crossOverParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblMutationparam))
+						.addComponent(mutationParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(63))
+		);
+		contentPane.setLayout(gl_contentPane);
 		
 		// Fill up the combobox
 		File f = new File("input");
 		for(String s : f.list())
 			cbFileList.addItem(s);
 		
-		populationSizeParam.setText(""+SearchProgram.INITIAL_POPULATION_SIZE);
-		crossOverParam.setText(""+SearchProgram.CROSS_OVER_LIMIT_RATIO);
-		mutationParam.setText(""+SearchProgram.MUTATION_LIMIT_RATIO);
-		
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (sp==null || sp.isInterrupted())
+				{
+					return;
+				}
+				else
+				{
+					sp.stop();
+					btnStop.setEnabled(false);
+					btnStart.setEnabled(true);
+				}
+			}
+		});
+
+			
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -201,19 +288,11 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					JOptionPane.showMessageDialog(MainFrame.this, e.getMessage());
 				}
 				
 			}
-		});
-		
-		btnStop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sp.stop();
-				btnStop.setEnabled(false);
-				btnStart.setEnabled(true);
-			}
-		});
-		
+		});		
 	}
 
 	private SearchProgram sp = null;

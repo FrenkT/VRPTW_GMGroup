@@ -34,15 +34,38 @@ public class GMObjectiveFunction {
 		Gene[] genes = e.getGenes();
 		Accelerator acc = Accelerator.getInstance();
 		
-		// TIP: We used 0 as Marker. This means we can simply calculate distances between depot and customers directly accessing the pre-calculated distances matrix.
+		// If we have at least one item, add the distance from depot to customer
+		int fromIndex = 0;
+		int toIndex = (int)genes[0].getAllele();
+		if (toIndex<0)
+			toIndex=0;
+		
+		if (genes.length>0)
+			totalLen+=acc.getDistanceBetween(fromIndex, toIndex);		
+		
 		for (int i=0;i<(genes.length-1);i++)
 		{
-			// Case: double depot
-			if (genes[i].equals(genes[i+1]) || ((int)genes[i].getAllele()<=0 && (int)genes[i+1].getAllele()<=0))
-				continue;
-			// Otherwise: calculate distance
-			totalLen+=acc.getDistanceBetween((int)genes[i].getAllele(), (int)genes[i+1].getAllele());
+			fromIndex = (int)genes[i].getAllele();
+			toIndex = (int)genes[i+1].getAllele();
+			
+			if (fromIndex<0)
+				fromIndex = 0;
+			
+			if (toIndex<0)
+				toIndex = 0;
+			
+			totalLen+=acc.getDistanceBetween(fromIndex, toIndex);
 		}
+		
+		// Add the distance to get back to bepot only if the last separator wasn't a depot itself
+		fromIndex=(int)genes[genes.length-1].getAllele();
+		toIndex = 0;
+		
+		if (fromIndex<0)
+			fromIndex=0;
+		
+		totalLen+=acc.getDistanceBetween(fromIndex, 0);
+		
 	
 		return totalLen;
 	}

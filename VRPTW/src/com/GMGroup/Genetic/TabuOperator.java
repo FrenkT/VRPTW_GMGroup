@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.coinor.opents.TabuSearchListener;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.IChromosome;
@@ -21,13 +22,17 @@ import com.mdvrp.Parameters;
 public class TabuOperator extends BaseGeneticOperator{
 
 	private static int NumberOfIterations = 0;
-	
-	public TabuOperator(Configuration a_configuration)
+	private TabuSearchListener listener=null;
+	public TabuOperator(Configuration a_configuration,TabuSearchListener listener)
 			throws InvalidConfigurationException {
 		super(a_configuration);
+		
+		this.listener=listener;
+		
 		// TODO Auto-generated constructor stub
 	}
 
+	
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
 //		Duration duration = new Duration();
@@ -50,6 +55,8 @@ public class TabuOperator extends BaseGeneticOperator{
 		
         // Apply the Tabu Search only to offsprings, do not touch parents
         int startIndex = a_population.getConfiguration().getPopulationSize();
+        if (startIndex==0)
+        	return;
         IChromosome[] offsprings = new IChromosome[a_candidateChromosomes.size()-startIndex];
         for (int k=startIndex;k<a_candidateChromosomes.size();k++)
         {
@@ -63,7 +70,6 @@ public class TabuOperator extends BaseGeneticOperator{
 	        // Start solving        
 	        search.tabuSearch.setIterationsToGo(parameters.getIterations());
 	        search.tabuSearch.startSolving();
-	        
 	        // Count routes
 	        int routesNr = 0;
 	        for(int i =0; i < search.feasibleRoutes.length; ++i)
@@ -78,7 +84,10 @@ public class TabuOperator extends BaseGeneticOperator{
 	        System.out.println("Ended tabu iteration # "+NumberOfIterations);
 	        NumberOfIterations++;
 	        try {
-				offsprings[k-startIndex]=solWrapper.toChromosome();
+	        	offsprings[k-startIndex]=((MySolutionGMWrapper)search.tabuSearch.getBestSolution()).toChromosome();
+	        	double test = search.tabuSearch.getBestSolution().getObjectiveValue()[0];
+	        	GMObjectiveFunction.evaluate(offsprings[k-startIndex]); //TODO : Mostrare agli altri cosa ho corretto: bestSolution!=actualsolution (solwrapper)
+	        	System.out.println(test);
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
