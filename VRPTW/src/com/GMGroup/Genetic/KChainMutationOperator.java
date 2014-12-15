@@ -102,7 +102,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 			}
 				
 		}
-		System.out.println("nÂ° cromosomi mutati: " + n_mutati);
+		System.out.println("N° cromosomi mutati: " + n_mutati);
 	}
 	
 	

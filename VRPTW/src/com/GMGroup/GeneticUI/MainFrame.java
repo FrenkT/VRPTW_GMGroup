@@ -134,7 +134,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		mutationParam = new JTextField();
 		mutationParam.setColumns(10);
 		
-		populationSizeParam.setText(""+SearchProgram.INITIAL_POPULATION_SIZE);
+		populationSizeParam.setText(""+SearchProgram.popSize);
 		crossOverParam.setText(""+SearchProgram.CROSS_OVER_LIMIT_RATIO);
 		mutationParam.setText(""+SearchProgram.MUTATION_LIMIT_RATIO);
 		
@@ -261,8 +261,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					double cop=Double.parseDouble(crossOverParam.getText());
 					double mop = Double.parseDouble(mutationParam.getText());
 					
-					sp = new SearchProgram(cbFileList.getSelectedItem().toString());
-					sp.setInitialPopulationSize(initialPopSize);
+					sp = new SearchProgram(cbFileList.getSelectedItem().toString(),Integer.parseInt(populationSizeParam.getText()));
 					sp.setCrossOverParam(cop);
 					sp.setMutationParam(mop);
 					

@@ -4,6 +4,7 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
@@ -18,7 +19,7 @@ import com.mdvrp.Parameters;
 
 public class SearchProgram extends Thread{
 
-	public static int INITIAL_POPULATION_SIZE=50;
+	public static int popSize=50;
 	public static int MAX_EVOLVE_GENERATIONS=30;
 	private boolean stopped=false;
 	/**
@@ -34,9 +35,11 @@ public class SearchProgram extends Thread{
 	
 	private MyGreedyCrossover cop;
 	private KChainMutationOperator mop;
+	private Configuration conf;
 	
-	public SearchProgram(String fileName) throws Exception
+	public SearchProgram(String fileName,int popSize) throws Exception
 	{
+		this.popSize=popSize;
 		stopped=false;
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
@@ -51,7 +54,7 @@ public class SearchProgram extends Thread{
 		
 		// ***** Setting up jgap *****
 		Configuration.reset();
-		Configuration conf = new DefaultConfiguration();
+		conf = new DefaultConfiguration();
 		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 0.90d);
 		bestChromsSelector.setDoubletteChromosomesAllowed(false);
 		conf.addNaturalSelector(bestChromsSelector, false);
@@ -71,7 +74,7 @@ public class SearchProgram extends Thread{
 		
 		// ***** Generating an initial population *****
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
-		IChromosome[] initialPop = new IChromosome[INITIAL_POPULATION_SIZE];
+		IChromosome[] initialPop = new IChromosome[popSize];
 		
 		int feasibleCount = 0;
 		int randomCount=0;
@@ -93,7 +96,7 @@ public class SearchProgram extends Thread{
 		System.out.println("*********   RandomCount: "+randomCount+"    *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
-		conf.setPopulationSize(INITIAL_POPULATION_SIZE);
+		conf.setPopulationSize(popSize);
 		population = new Genotype(conf,initialPop);
 		
 	}
@@ -145,10 +148,6 @@ public class SearchProgram extends Thread{
 			best=population.getFittestChromosome();
 		
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
-	}
-
-	public void setInitialPopulationSize(int initialPopSize) {
-		this.INITIAL_POPULATION_SIZE = initialPopSize;
 	}
 
 	public void setCrossOverParam(double crossOverParam) {
