@@ -45,17 +45,31 @@ public class MyChromosomeFactory {
 	private Random rnd;
 	private double MAX_WAITABLE_TIME_RATIO = 0.08;
 	private double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
+	private Configuration conf;
 	
-	public static MyChromosomeFactory getInstance()
+	public static MyChromosomeFactory getInstance(Configuration conf) throws InvalidConfigurationException
 	{
 		if (instance==null)
-			instance = new MyChromosomeFactory();
+			instance = new MyChromosomeFactory(conf);
 		return instance;
 	}
 	
-	private MyChromosomeFactory()
+	
+	final private Gene[] initialGenes; 
+	private MyChromosomeFactory(Configuration conf) throws InvalidConfigurationException
 	{
+		this.conf = conf;
 		rnd= new Random((int)(UUID.randomUUID()).hashCode());
+		int genLen = Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()-1;
+		initialGenes = new IntegerGene[genLen];
+		
+		int startAllele=-Instance.getInstance().getVehiclesNr()+2;
+		for (int i=0;i<genLen;i++)
+		{
+			initialGenes[i]=new IntegerGene(conf);
+			initialGenes[i].setAllele(startAllele);
+			startAllele++;
+		}
 	}
 	
 	public static double DEBUG_MEDIA_POPOLAZIONE(Population pop)
@@ -75,6 +89,30 @@ public class MyChromosomeFactory {
 	}
 	
 	
+	public IChromosome generateInitialRandomChromosome() throws InvalidConfigurationException
+	{
+		ShuffleArray(initialGenes);
+		
+		// Costruisco l'oggetto chromosome a partire dai risultati ottenuti.
+		Chromosome res = new Chromosome(conf,initialGenes);
+		//res.setConstraintChecker(constraintChecker);
+		return res;	
+	}
+	
+	private void ShuffleArray(Gene[] array)
+	{
+	    Gene temp;
+	    int index;
+	    Random random = new Random();
+	    for (int i = array.length - 1; i > 0; i--)
+	    {
+	        index = random.nextInt(i + 1);
+	        temp = array[index];
+	        array[index] = array[i];
+	        array[i] = temp;
+	    }
+	}
+	
 	//public static final int VEICHLE_MARKER = 0;
 	//private static MyChromosomeContraintChecker constraintChecker = new MyChromosomeContraintChecker();
 	/** 
@@ -83,7 +121,7 @@ public class MyChromosomeFactory {
 	 * @throws Exception 
 	 *  
 	 **/
-	public IChromosome generateInitialFeasibleChromosome(Configuration conf) throws Exception
+	public IChromosome generateInitialFeasibleChromosome() throws Exception
 	{
 		
 		Point2D depot = Accelerator.getInstance().getDepotLocaltion();
@@ -109,7 +147,7 @@ public class MyChromosomeFactory {
 		int minVeichles = (int)Math.ceil( totalDemand / Instance.getInstance().getCapacity(0, 0));
 		double capacityPerVeichle = Instance.getInstance().getCapacity(0, 0);
 		if ((maxVeichles-minVeichles)<1)
-			throw new Exception("Capacity constraints too strict. No possible solution could be found.");
+			throw new IncompleteSolutionException("Capacity constraints too strict. No possible solution could be found.");
 		
 		// Crea una lista di veicoli, per ognuno di questi crea una lista di clienti da trasportare
 		Object[] veichles = new Object[maxVeichles];
@@ -206,19 +244,30 @@ public class MyChromosomeFactory {
 		if (customers.size()>0)
 		{
 			System.err.println("Unassigned "+customers.size());
-			throw new Exception("Some customers haven't been assigned to any vehichle");
+			throw new IncompleteSolutionException("Some customers haven't been assigned to any vehichle");
 		}
 		
 		
 		int k = 0;
-		Gene[] genes = new IntegerGene[Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()-1];
+		Gene[] genes = new Gene[initialGenes.length];
 		for (int i=0;i<veichles.length;i++)
 		{
 			for (Integer customNumber : (ArrayList<Integer>)veichles[i])
 			{
-				genes[k] = new IntegerGene(conf);
-				genes[k].setAllele(customNumber);
-				k++;
+				boolean found = false;
+				for(Gene g : initialGenes)
+				{
+					if ((int)g.getAllele()==customNumber)
+					{
+						genes[k]=g;
+						found = true;
+						k++;
+					}
+				}
+				if (!found)
+					throw new Exception("Gene "+customNumber+" not found into primitive gene generation.");
+				//genes[k] = new IntegerGene(conf);
+				//genes[k].setAllele(customNumber);
 			}
 			if (i<(veichles.length-1))
 			{

@@ -1,10 +1,8 @@
 package com.GMGroup.Genetic;
 
-import java.io.FileWriter;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.coinor.opents.TabuSearchListener;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.IChromosome;
@@ -15,12 +13,15 @@ import com.TabuSearch.MyMoveManager;
 import com.TabuSearch.MyObjectiveFunction;
 import com.TabuSearch.MySearchProgram;
 import com.TabuSearch.MyTabuList;
-import com.mdvrp.Duration;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
 public class TabuOperator extends BaseGeneticOperator{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static int NumberOfIterations = 0;
 	public TabuOperator(Configuration a_configuration)
 			throws InvalidConfigurationException {
@@ -29,6 +30,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	}
 
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
 //		Duration duration = new Duration();
@@ -96,7 +98,6 @@ public class TabuOperator extends BaseGeneticOperator{
         
         // ----- SUBSISTUTE offsprings with tabu-searhed ones ------
         // Swap old with new
-        int offChromIndex = 0;
         for (int j=a_candidateChromosomes.size()-1;j>=startIndex;j--)
         {
         	a_candidateChromosomes.remove(j);

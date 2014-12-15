@@ -6,6 +6,7 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+import org.jgap.impl.IntegerGene;
 
 import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
@@ -60,12 +61,28 @@ public class SearchProgram extends Thread{
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
 		// ***** Generating an initial population *****
+		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[INITIAL_POPULATION_SIZE];
+		
+		int feasibleCount = 0;
+		int randomCount=0;
 		for (int i=0;i<initialPop.length;i++)
 		{
-			initialPop[i]=MyChromosomeFactory.getInstance().generateInitialFeasibleChromosome(conf);
+			try {
+				initialPop[i]=MyChromosomeFactory.getInstance(conf).generateInitialFeasibleChromosome();
+				feasibleCount++;
+			}
+			catch (Exception IncompleteSolutionException)
+			{
+				initialPop[i]=MyChromosomeFactory.getInstance(conf).generateInitialRandomChromosome();
+				randomCount++;
+			}
 			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
+		System.out.println("*************** INITIAL POPULATION FUNDED ***************");
+		System.out.println("*********  FeasibleCount: "+feasibleCount+"   *********");
+		System.out.println("*********   RandomCount: "+randomCount+"    *********");
+		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(INITIAL_POPULATION_SIZE);
 		population = new Genotype(conf,initialPop);
