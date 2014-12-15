@@ -102,12 +102,18 @@ public class Accelerator {
 				else if (j==0)
 				{
 					to = depot.getLocation();
-					distances[i][j]=from.distance(to);
+					//distances[i][j]=from.distance(to);//TODO //FIXME Changing this to the Prof version. I disagree, but let's be consistent
+					distances[i][j] = Math.sqrt(Math.pow(from.getX() - to.getX(), 2)
+							+ Math.pow(from.getY() - to.getY(), 2));
+					distances[i][j] = Math.floor(distances[i][j] * 10) / 10;
 				}
 				else
 				{
 					to = customers[j-1].getLocation();
-					distances[i][j]=from.distance(to);
+					//distances[i][j]=from.distance(to);
+					distances[i][j] = Math.sqrt(Math.pow(from.getX() - to.getX(), 2)
+							+ Math.pow(from.getY() - to.getY(), 2));
+					distances[i][j] = Math.floor(distances[i][j] * 10) / 10;
 				}
 			}			
 		}

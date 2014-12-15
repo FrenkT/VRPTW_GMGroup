@@ -329,7 +329,7 @@ public class Instance {
 							2)
 							+ Math.pow(customers.get(i).getYCoordinate()
 									- depots.get(d).getYCoordinate(), 2));
-					distances[i][j] = Math.floor(distances[i][j] * 10) / 10;
+					distances[i][j] = Math.floor(distances[i][j] * 10) / 10; //TODO Uncomment this
 					distances[j][i] = distances[i][j];
 
 					// case both depots

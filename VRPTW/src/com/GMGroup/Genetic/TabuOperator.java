@@ -82,7 +82,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	        try {
 	        	offsprings[k-startIndex]=((MySolutionGMWrapper)search.tabuSearch.getBestSolution()).toChromosome();
 	        	double test = search.tabuSearch.getBestSolution().getObjectiveValue()[0];
-	        	GMObjectiveFunction.evaluate(offsprings[k-startIndex]); //TODO : Mostrare agli altri cosa ho corretto: bestSolution!=actualsolution (solwrapper)
+	        	GMObjectiveFunction.evaluate(offsprings[k-startIndex]);//TODO : Mostrare agli altri cosa ho corretto: bestSolution!=actualsolution (solwrapper)
 	        	System.out.println(test);
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
