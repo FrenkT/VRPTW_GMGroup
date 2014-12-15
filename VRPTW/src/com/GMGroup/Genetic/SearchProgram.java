@@ -57,7 +57,7 @@ public class SearchProgram extends Thread{
 		cop2.setParameter(MUTATION_LIMIT_RATIO);
 		conf.addGeneticOperator(cop2);
 		
-		conf.addGeneticOperator(new TabuOperator(conf,MainFrame.getInstance()));
+		conf.addGeneticOperator(new TabuOperator(conf));
 		
 		// ***** Generating an initial population *****
 		IChromosome[] initialPop = new IChromosome[INITIAL_POPULATION_SIZE];
