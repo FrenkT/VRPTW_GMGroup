@@ -22,13 +22,9 @@ import com.mdvrp.Parameters;
 public class TabuOperator extends BaseGeneticOperator{
 
 	private static int NumberOfIterations = 0;
-	private TabuSearchListener listener=null;
-	public TabuOperator(Configuration a_configuration,TabuSearchListener listener)
+	public TabuOperator(Configuration a_configuration)
 			throws InvalidConfigurationException {
-		super(a_configuration);
-		
-		this.listener=listener;
-		
+		super(a_configuration);		
 		// TODO Auto-generated constructor stub
 	}
 
