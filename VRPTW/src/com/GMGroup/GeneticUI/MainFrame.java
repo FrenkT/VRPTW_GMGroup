@@ -266,6 +266,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					sp.setCrossOverParam(cop);
 					sp.setMutationParam(mop);
 					
+					
 					btnStart.setEnabled(false);
 					btnStop.setEnabled(true);
 					

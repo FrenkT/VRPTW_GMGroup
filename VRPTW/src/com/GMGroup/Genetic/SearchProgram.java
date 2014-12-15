@@ -32,6 +32,9 @@ public class SearchProgram extends Thread{
 	
 	public static int MUTATION_NUM_OF_GENES = 4;
 	
+	private MyGreedyCrossover cop;
+	private KChainMutationOperator mop;
+	
 	public SearchProgram(String fileName) throws Exception
 	{
 		stopped=false;
@@ -54,15 +57,15 @@ public class SearchProgram extends Thread{
 		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
-		MyGreedyCrossover cop = new MyGreedyCrossover(conf);
+		cop = new MyGreedyCrossover(conf);
 		cop.setStartOffset(0);
-		cop.setRate(CROSS_OVER_LIMIT_RATIO);
+		//cop.setRate(CROSS_OVER_LIMIT_RATIO);
 		conf.addGeneticOperator(cop);
 		
-		KChainMutationOperator cop2 = new KChainMutationOperator(conf);
-		cop2.setMutationRate(MUTATION_NUM_OF_GENES);
-		cop2.setParameter(MUTATION_LIMIT_RATIO);
-		conf.addGeneticOperator(cop2);
+		mop = new KChainMutationOperator(conf);
+		mop.setMutationRate(MUTATION_NUM_OF_GENES);
+		mop.setParameter(MUTATION_LIMIT_RATIO);
+		conf.addGeneticOperator(mop);
 		
 		conf.addGeneticOperator(new TabuOperator(conf));
 		
@@ -151,11 +154,12 @@ public class SearchProgram extends Thread{
 	public void setCrossOverParam(double crossOverParam) {
 	
 		this.CROSS_OVER_LIMIT_RATIO = crossOverParam;
-		
+		this.cop.setRate(crossOverParam);
 	}
 
-	public void setMutationParam(double mop) {
-		this.MUTATION_LIMIT_RATIO=mop;
+	public void setMutationParam(double parameter) {
+		this.MUTATION_LIMIT_RATIO=parameter;
+		mop.setParameter(parameter);
 	}
 
 	
