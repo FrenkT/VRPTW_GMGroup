@@ -770,7 +770,6 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
         if( iterationsToGo > 0 )
             fireTabuSearchStarted();
         
-        
         // While not canceled and iterations left to go
         while( keepSolving && ( iterationsToGo > 0 ) )
         {   
