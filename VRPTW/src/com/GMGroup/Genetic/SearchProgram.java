@@ -97,7 +97,7 @@ public class SearchProgram extends Thread{
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
 		
-		population.evolve(3);
+		population.evolve(10);
 		
 		c = population.getFittestChromosome();
 		res = GMObjectiveFunction.evaluate(c);

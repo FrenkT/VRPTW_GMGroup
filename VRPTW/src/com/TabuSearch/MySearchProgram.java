@@ -23,6 +23,16 @@ public class MySearchProgram implements TabuSearchListener{
 	public int bestIndex;
 	public DecimalFormat df = new DecimalFormat("#.##");
 	
+	//our parameters
+	private int noImprovingCounter=0;
+	private int noImprovingThresold=50;
+	
+	/**
+	 * Represents the PERCENTAGE of minimum improvement which causes the tabu to continue.
+	 * If noImprovingCounter reaches noImprovingThreshold, abort.
+	 */
+	private double deltaRatio=5;
+	
 	public MySearchProgram(Instance instance, Solution initialSol, MoveManager moveManager, ObjectiveFunction objFunc, TabuList tabuList, boolean minmax, PrintStream outPrintStream)
 	{
 		tabuSearch = new SingleThreadedTabuSearch(initialSol, moveManager, objFunc,tabuList,	new BestEverAspirationCriteria(), minmax );
@@ -41,10 +51,16 @@ public class MySearchProgram implements TabuSearchListener{
 	 */
 	@Override
 	public void newBestSolutionFound(TabuSearchEvent event) {
+		double improvement=sol.getObjectiveValue()[0]/event.getTabuSearch().getBestSolution().getObjectiveValue()[0]*100;
+		improvement=100-improvement;
 		sol = ((MySolution)tabuSearch.getBestSolution());
 		bestCost 	= getCostFromObjective(sol.getObjectiveValue());
 		bestRoutes 	= cloneRoutes(sol.getRoutes());
 		bestIndex 	= tabuSearch.getIterationsCompleted() + 1; // plus the current one
+		if(improvement>deltaRatio) 
+			noImprovingCounter=0;
+		
+		
 	}
 
 	/**
@@ -56,6 +72,7 @@ public class MySearchProgram implements TabuSearchListener{
 	@Override
 	public void newCurrentSolutionFound(TabuSearchEvent event) {
 		sol = ((MySolution)tabuSearch.getCurrentSolution());
+		//
 		currentCost = getCostFromObjective(sol.getObjectiveValue());
 		MySearchProgram.iterationsDone += 1;
 		
@@ -75,7 +92,12 @@ public class MySearchProgram implements TabuSearchListener{
 	}
 
 	@Override
-	public void noChangeInValueMoveMade(TabuSearchEvent event) {}
+	public void noChangeInValueMoveMade(TabuSearchEvent event) {
+		noImprovingCounter++;
+		if(noImprovingCounter>noImprovingThresold){
+			stopTabu();
+		}
+	}
 
 	/**
 	 * When tabu search starts initialize best cost and
@@ -113,7 +135,12 @@ public class MySearchProgram implements TabuSearchListener{
 	}
 
 	@Override
-	public void unimprovingMoveMade(TabuSearchEvent event) {}
+	public void unimprovingMoveMade(TabuSearchEvent event) {
+		noImprovingCounter++;
+		if(noImprovingCounter>noImprovingThresold){
+			stopTabu();
+		}
+	}
 	
 	// return a new created cost from the objective vector passed as parameter
 	private Cost getCostFromObjective(double[] objective) {
@@ -150,5 +177,9 @@ public class MySearchProgram implements TabuSearchListener{
 	 */
 	public static void setIterationsDone(int iterationsDone) {
 		MySearchProgram.iterationsDone = iterationsDone;
+	}
+	
+	private void stopTabu(){
+		this.tabuSearch.setIterationsToGo(0);
 	}
 }
