@@ -1,22 +1,31 @@
 package com.GMGroup.Genetic;
 
 import org.jgap.FitnessFunction;
-import org.jgap.Gene;
 import org.jgap.IChromosome;
 
-import com.mdvrp.Instance;
 
 public class MyFitnessFunction extends FitnessFunction {
 
-	public final static double penaltyScale = 10; // TODO
+	public final static double Capacitypenalty = 50; // TODO
+	public final static double TimeWpenalty = 5;
 	
 	
 	/**
-	 * Simply calling the Objective function in an inverse way
+	 * This function evaluate the fitness function of a chromosome  
+	 * 
+	 * @input IChromosome
+	 * @output Value of the fitness function of the chromosome 
 	 */
 	@Override
 	protected double evaluate(IChromosome arg) {
-		
+		double result=0;
+		double[] viol;
+		viol=MyChromosomeFactory.getEntitiesOfViolations(arg);
+		result=GMObjectiveFunction.evaluate(arg);
+		result+=(Capacitypenalty*viol[1]);
+		result+=(TimeWpenalty*viol[3]);
+		return 1/result;
+		/*
 		Gene[] gens = arg.getGenes(); 
 		Accelerator acc = Accelerator.getInstance();
 		double actualCost = 0;
@@ -56,6 +65,8 @@ public class MyFitnessFunction extends FitnessFunction {
 			res = 1/GMObjectiveFunction.evaluate(arg);
 		}
 		return res;
+		*/
 	}	
+	
 	
 }
