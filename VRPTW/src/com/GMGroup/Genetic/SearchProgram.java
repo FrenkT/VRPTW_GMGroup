@@ -105,9 +105,8 @@ public class SearchProgram extends Thread{
 				System.out.print(g.getAllele()+";");
 			
 			System.out.println("");	
-			
-			System.out.println("\nBest feasible solution: "+GMObjectiveFunction.evaluate(best));
 		}
+		System.out.println("\nBest feasible solution: "+GMObjectiveFunction.evaluate(best));
 	}
 
 	public void setInitialPopulationSize(int initialPopSize) {
