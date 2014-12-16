@@ -100,7 +100,6 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		int addedCounter=0;
 		if (mutationProbability < 1) {
 			for (int i = 0; i < size; i++) {
-
 				IChromosome x = a_population.getChromosome(i);
 				IChromosome xm = operate(x, currentRate, generator);
 				if (xm != null) {
