@@ -98,15 +98,16 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		// ----------------------------------------------------------------
 		int size = a_population.size();
 		int addedCounter=0;
-		for (int i = 0; i < size; i++) {
-			if(mutationProbability<1){
+		if (mutationProbability < 1) {
+			for (int i = 0; i < size; i++) {
+
 				IChromosome x = a_population.getChromosome(i);
 				IChromosome xm = operate(x, currentRate, generator);
 				if (xm != null) {
 					a_candidateChromosomes.add(xm);
 					addedCounter++;
 				}
-			}				
+			}
 		}
 		
 		System.out.println("---- KChainMutation Operator mutated and added "+addedCounter+" elements");
