@@ -175,14 +175,12 @@ public class SearchProgram extends Thread{
 				,""+params.getTabuNonImprovingThresold()
 				,""+params.getTabuDeltaRatio()
 				,""// MutationProb
-				,""// TWPenalty
-				,""// Cap Penalty
+				,"" + MyFitnessFunction.TimeWPenalty
+				,"" + MyFitnessFunction.CapacityPenalty
 				,""// Empty
 				,""+GMObjectiveFunction.evaluate(best)
 				,""// Time
 		};
-				
-				
 		
 		writer.writeNext(rsltStr);
 		writer.close();
