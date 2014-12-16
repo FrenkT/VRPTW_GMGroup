@@ -21,7 +21,7 @@ public class MySearchParameters {
 	 * crossovers. The input parameter should be positive. 
 	 * Default value is 0.3.
 	 */
-	private double crossOverLimitRatio = 0.3;
+	private double crossOverLimitRatio = 1;
 	
 	/**
 	 * Defines the AlphaParameter of the KChainMutation operator.
@@ -41,7 +41,7 @@ public class MySearchParameters {
 	 * a tabu session. 
 	 * Default value is 50.
 	 */
-	private int tabuNonImprovingThresold=50;
+	private int tabuNonImprovingThresold=100;
 	
 	/**
 	 * Represents the PERCENTAGE of minimum improvement which causes the tabu to continue.
@@ -49,7 +49,7 @@ public class MySearchParameters {
 	 * a new solution is considered IMPROVING when the delta is greater than 5%.
 	 * Default value is 0.1 => 0.1%.
 	 */
-	private double tabuDeltaRatio=0.1;
+	private double tabuDeltaRatio=0.00001;
 
 	/**
 	 * @return the tabuDeltaRatio
