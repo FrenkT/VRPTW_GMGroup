@@ -1,17 +1,13 @@
 package com.GMGroup.Genetic;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
-
-import com.TabuSearch.MySearchProgram;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
@@ -184,6 +180,8 @@ public class SearchProgram extends Thread{
 		
 		writer.writeNext(rsltStr);
 		writer.close();
+		ProcessBuilder pb = new ProcessBuilder("data.csv");
+		pb.start();
 	}
 
 	
