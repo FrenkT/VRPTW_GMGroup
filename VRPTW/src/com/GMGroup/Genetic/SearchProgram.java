@@ -180,8 +180,8 @@ public class SearchProgram extends Thread{
 		
 		writer.writeNext(rsltStr);
 		writer.close();
-		ProcessBuilder pb = new ProcessBuilder("data.csv");
-		pb.start();
+		//ProcessBuilder pb = new ProcessBuilder("data.csv");
+		//pb.start();
 	}
 
 	
