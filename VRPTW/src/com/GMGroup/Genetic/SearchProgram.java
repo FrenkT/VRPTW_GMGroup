@@ -4,16 +4,8 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
-import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.IntegerGene;
-
-import sun.java2d.pipe.SpanClipRenderer;
-
-import com.GMGroup.GeneticUI.MainFrame;
-import com.TabuSearch.MySearchProgram;
-import com.TabuSearch.MySolution;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
@@ -75,24 +67,34 @@ public class SearchProgram extends Thread{
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
 		
-		int feasibleCount = 0;
+		int algorithmCount = 0;
 		int randomCount=0;
+		int feasibleAlg=0;
+		int feasibleRan=0;
 		for (int i=0;i<initialPop.length;i++)
 		{
 			try {
-				initialPop[i]=MyChromosomeFactory.getInstance(conf).generateInitialFeasibleChromosome();
-				feasibleCount++;
+				initialPop[i]=factory.generateInitialFeasibleChromosome();
+				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
+				{
+					feasibleAlg++;
+				}
+				algorithmCount++;
 			}
 			catch (Exception IncompleteSolutionException)
 			{
-				initialPop[i]=MyChromosomeFactory.getInstance(conf).generateInitialRandomChromosome();
+				initialPop[i]=factory.generateInitialRandomChromosome();
+				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
+				{
+					feasibleRan++;
+				}
 				randomCount++;
 			}
 			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
 		System.out.println("*************** INITIAL POPULATION FUNDED ***************");
-		System.out.println("*********  FeasibleCount: "+feasibleCount+"   *********");
-		System.out.println("*********   RandomCount: "+randomCount+"    *********");
+		System.out.println("*********  GeneretadWithTheAlgorithmCount: "+algorithmCount+" Feasible: "+feasibleAlg+"  *********");
+		System.out.println("**************  GeneratedRandomCount: "+randomCount+" Feasible: "+feasibleRan+"  *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(params.getInitialPopulationSize());
@@ -110,7 +112,7 @@ public class SearchProgram extends Thread{
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
 		
-		population.evolve(params.getMaxEvolveIterations());
+		population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
 		
 		PrintStatus();
 	}
@@ -154,7 +156,4 @@ public class SearchProgram extends Thread{
 		stopped = true;
 		this.stop();
 	}
-
-	
-	
 }

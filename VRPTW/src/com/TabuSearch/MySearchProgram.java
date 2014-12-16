@@ -25,13 +25,13 @@ public class MySearchProgram implements TabuSearchListener{
 	
 	//our parameters
 	private int noImprovingCounter=0;
-	private int noImprovingThresold=50;
+	private int noImprovingThresold=100;
 	
 	/**
 	 * Represents the PERCENTAGE of minimum improvement which causes the tabu to continue.
 	 * If noImprovingCounter reaches noImprovingThreshold, abort.
 	 */
-	private double deltaRatio=5;
+	private double deltaRatio=0.00001;
 	
 	public void setNoImprovingIterationThreshold(int iterationsNumber)
 	{
