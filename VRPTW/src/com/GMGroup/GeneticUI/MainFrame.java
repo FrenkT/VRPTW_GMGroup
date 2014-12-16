@@ -62,6 +62,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private JTextField crossOverLimitRatioInput;
 	private JTextField alphaParamInput;
 	private JComboBox<String> cbFileList;
+	private TimerTask gameOverTT;
+	private Timer gameOver;
 	
 	private static MainFrame instance;
 	
@@ -175,7 +177,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(10)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -183,7 +185,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 								.addComponent(lblNewLabel_1)
 								.addComponent(lblEvolveStatus)
 								.addComponent(lblCurrentTop))
-							.addGap(105)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblCurrentTopVal)
 								.addComponent(lblEvolveStatusValue)
@@ -222,7 +224,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							.addComponent(lblTabuDeltaThreshold))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))
+							.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 236, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(chkbxStopAt5)))
@@ -232,21 +234,23 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(19)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblTimeElapsed)
-						.addComponent(lblElapsedTimeVal))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_1)
-						.addComponent(lblStartedAtValue))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblEvolveStatus)
-						.addComponent(lblEvolveStatusValue))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblCurrentTop)
-						.addComponent(lblCurrentTopVal))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(lblTimeElapsed)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_1)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblEvolveStatus)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblCurrentTop))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(lblElapsedTimeVal)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblStartedAtValue)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblEvolveStatusValue)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblCurrentTopVal)))
 					.addGap(18)
 					.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -296,6 +300,13 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (gameOverTT!=null)
+				{
+					gameOverTT.run();
+					gameOver.cancel();
+				}
+				
+				/*
 				if (sp==null || sp.isInterrupted())
 				{
 					return;
@@ -304,6 +315,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 				{
 					sp.halt();
 				}
+				*/
 			}
 		});
 
@@ -331,7 +343,12 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							btnStop.setEnabled(false);
 							btnStart.setEnabled(true);
 							//e.printStackTrace(System.err);
-							sp.PrintStatus();
+							try {
+								sp.PrintStatus();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
 					});
 					
@@ -344,17 +361,17 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					// Stop this Thread after 5 minutes
 					if (chkbxStopAt5.isSelected())
 					{
-						Timer gameOver = new Timer();
-						gameOver.schedule(new TimerTask(){
-	
+						gameOver = new Timer();
+						gameOverTT = new TimerTask(){
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
 								sp.halt();
 								t.cancel();
 							}
-							
-						}, MAX_TIMEOUT); // Stop after 
+						};
+						
+						gameOver.schedule(gameOverTT, MAX_TIMEOUT); // Stop after 
 					}
 					
 				} catch (Exception e) {

@@ -1,13 +1,20 @@
 package com.GMGroup.Genetic;
 
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
+import com.TabuSearch.MySearchProgram;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
+import com.opencsv.CSVWriter;
 
 public class SearchProgram extends Thread{
 
@@ -114,10 +121,15 @@ public class SearchProgram extends Thread{
 		
 		population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
 		
-		PrintStatus();
+		try {
+			PrintStatus();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public void PrintStatus()
+	public void PrintStatus() throws IOException
 	{
 
 		IChromosome c = population.getFittestChromosome();
@@ -149,8 +161,35 @@ public class SearchProgram extends Thread{
 			best=population.getFittestChromosome();
 		
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
+		
+		
+		CSVWriter writer = new CSVWriter(new FileWriter("data.csv",true));
+		
+		String[] rsltStr = new String[]{
+				""+params.getInitialPopulationSize()
+				,""+params.getMaxEvolveIterations()
+				,""+params.getCrossOverLimitRatio()
+				,""+params.getAlphaParameterKChain()
+				,""+params.getNumOfKChainSwap()
+				,""
+				,""+params.getTabuNonImprovingThresold()
+				,""+params.getTabuDeltaRatio()
+				,""// MutationProb
+				,""// TWPenalty
+				,""// Cap Penalty
+				,""// Empty
+				,""+GMObjectiveFunction.evaluate(best)
+				,""// Time
+		};
+				
+				
+		
+		writer.writeNext(rsltStr);
+		writer.close();
 	}
 
+	
+	
 	public void halt() {
 		// TODO Auto-generated method stub
 		stopped = true;

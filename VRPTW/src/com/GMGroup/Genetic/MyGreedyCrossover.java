@@ -47,7 +47,7 @@ public class MyGreedyCrossover extends GreedyCrossover {
 		
 		int size = Math.min(getConfiguration().getPopulationSize(),
 				a_population.size());
-		int numCrossovers = (int)(size * m_rate);
+		int numCrossovers = (int)(size * m_rate)/2;
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		// For each crossover, grab two random chromosomes and do what
 		// Grefenstette et al say.
@@ -75,6 +75,7 @@ public class MyGreedyCrossover extends GreedyCrossover {
 			a_candidateChromosomes.add(firstMate);
 			a_candidateChromosomes.add(secondMate);
 		}
+		System.out.println("---- GreedyCrossover Operator has ended and added "+numCrossovers*2+" elements");
 	}
 
 }

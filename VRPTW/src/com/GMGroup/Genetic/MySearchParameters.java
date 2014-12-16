@@ -27,7 +27,7 @@ public class MySearchParameters {
 	 * Defines the AlphaParameter of the KChainMutation operator.
 	 * Default value is 5. //TODO //FIXME
 	 */
-	private double alphaParameterKChain = 0.005;
+	private double alphaParameterKChain = 5;
 	
 	/**
 	 * Defines how many swaps must be performed in a key-chain mutation operator.
