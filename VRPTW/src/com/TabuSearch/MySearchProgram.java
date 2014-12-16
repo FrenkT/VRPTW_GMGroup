@@ -33,6 +33,23 @@ public class MySearchProgram implements TabuSearchListener{
 	 */
 	private double deltaRatio=5;
 	
+	public void setNoImprovingIterationThreshold(int iterationsNumber)
+	{
+		if (iterationsNumber<0)
+			throw new IllegalArgumentException();
+		
+		this.noImprovingThresold=iterationsNumber;
+	}
+	
+	public void setMinimumDeltaPercentige(double deltaPercentige)
+	{
+		if (deltaPercentige<0)
+			throw new IllegalArgumentException();
+		
+		this.deltaRatio=deltaPercentige;
+	}
+	
+	
 	public MySearchProgram(Instance instance, Solution initialSol, MoveManager moveManager, ObjectiveFunction objFunc, TabuList tabuList, boolean minmax, PrintStream outPrintStream)
 	{
 		tabuSearch = new SingleThreadedTabuSearch(initialSol, moveManager, objFunc,tabuList,	new BestEverAspirationCriteria(), minmax );

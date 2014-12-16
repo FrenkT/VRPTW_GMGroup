@@ -23,17 +23,27 @@ public class TabuOperator extends BaseGeneticOperator{
 	 */
 	private static final long serialVersionUID = 1L;
 	private static int NumberOfIterations = 0;
-	public TabuOperator(Configuration a_configuration)
+	public TabuOperator(Configuration a_configuration, double minDeltaThreshold, int maxIterationThreshold)
 			throws InvalidConfigurationException {
 		super(a_configuration);		
+		this.minDeltaThreshold=minDeltaThreshold;
+		this.maxIterationThreshold=maxIterationThreshold;
 		// TODO Auto-generated constructor stub
 	}
 
+	private double minDeltaThreshold;
+	private int maxIterationThreshold;
+	
 	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
 
+		
+		System.out.println("---- Invoked TabuOperator with Params: ");
+		System.out.println("---- DeltaPercentige: "+minDeltaThreshold+"%");
+		System.out.println("---- IterationThreshold: "+maxIterationThreshold);
+		
 		// Should we apply the tabu to all the chromosomes of the population?
 		Instance instance = Instance.getInstance();		
 		Parameters parameters = instance.getParameters();
@@ -61,11 +71,13 @@ public class TabuOperator extends BaseGeneticOperator{
         	MySolutionGMWrapper solWrapper = new MySolutionGMWrapper(c);
 	        MySearchProgram search = new MySearchProgram(instance, solWrapper, moveManager,
 							            objFunc, tabuList, false,  outPrintSream);
+	        search.setMinimumDeltaPercentige(minDeltaThreshold);
+	        search.setNoImprovingIterationThreshold(maxIterationThreshold);
 	        
 	        // Start solving        
         	search.tabuSearch.setIterationsToGo(parameters.getIterations());
     		search.tabuSearch.startSolving();
-
+    		
 	        // Count routes
 	        int routesNr = 0;
 	        for(int i =0; i < search.feasibleRoutes.length; ++i)

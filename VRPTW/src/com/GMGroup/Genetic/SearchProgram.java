@@ -19,27 +19,15 @@ import com.mdvrp.Parameters;
 
 public class SearchProgram extends Thread{
 
-	public static int popSize=50;
-	public static int MAX_EVOLVE_GENERATIONS=30;
 	private boolean stopped=false;
-	/**
-	 * Makes the crossover operator to operate on a limited number of parents.
-	 * If INITIAL_SIZE_POPULATION is 90, there will be 90 * CROSS_OVER_RATIO 
-	 * crossovers.
-	 */
-	public static double CROSS_OVER_LIMIT_RATIO = 0.3;
-	
-	public static double MUTATION_LIMIT_RATIO = 0.005;
-	
-	public static int MUTATION_NUM_OF_GENES = 4;
-	
 	private MyGreedyCrossover cop;
 	private KChainMutationOperator mop;
 	private Configuration conf;
+	private MySearchParameters params;
 	
-	public SearchProgram(String fileName,int popSize) throws Exception
+	public SearchProgram(String fileName,MySearchParameters params) throws Exception
 	{
-		this.popSize=popSize;
+		this.params = params;
 		stopped=false;
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
@@ -62,19 +50,30 @@ public class SearchProgram extends Thread{
 		conf.getGeneticOperators().clear();
 		cop = new MyGreedyCrossover(conf);
 		cop.setStartOffset(0);
-		//cop.setRate(CROSS_OVER_LIMIT_RATIO);
+		cop.setRate(params.getCrossOverLimitRatio());
 		conf.addGeneticOperator(cop);
 		
 		mop = new KChainMutationOperator(conf);
-		mop.setMutationRate(MUTATION_NUM_OF_GENES);
-		mop.setParameter(MUTATION_LIMIT_RATIO);
+		mop.setAlpha(params.getAlphaParameterKChain());
+		mop.setMutationRate(params.getNumOfKChainSwap());
 		conf.addGeneticOperator(mop);
+		/*
+		 * currentParams.setAlphaParameterKChain(Double.parseDouble(alphaParamInput.getText()));
+					currentParams.setCrossOverLimitRatio(Double.parseDouble(crossOverLimitRatioInput.getText()));
+					currentParams.setCrossOverLimitRatio(Double.parseDouble(initialPopulationInput.getText()));
+					currentParams.setMaxEvolveIterations(Integer.parseInt(maxEvolveIterationsInput.getText()));
+					currentParams.setNumOfKChainSwap(Integer.parseInt(numOfKChainSwapsInput.getText()));
+					currentParams.setTabuNonImprovingThresold(Integer.parseInt(tabuNonImprovingThresholdInput.getText()));
+					currentParams.setTabuDeltaRatio(Integer.parseInt(tabuDeltaThresholdInput.getText()));
+					
+		 */
+		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
 		
-		conf.addGeneticOperator(new TabuOperator(conf));
+		conf.addGeneticOperator(top);
 		
 		// ***** Generating an initial population *****
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
-		IChromosome[] initialPop = new IChromosome[popSize];
+		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
 		
 		int feasibleCount = 0;
 		int randomCount=0;
@@ -96,7 +95,7 @@ public class SearchProgram extends Thread{
 		System.out.println("*********   RandomCount: "+randomCount+"    *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
-		conf.setPopulationSize(popSize);
+		conf.setPopulationSize(params.getInitialPopulationSize());
 		population = new Genotype(conf,initialPop);
 		
 	}
@@ -111,7 +110,7 @@ public class SearchProgram extends Thread{
 		double res = GMObjectiveFunction.evaluate(c);
 		System.out.println("Best of population Before EVOLVE: "+res);
 		
-		population.evolve(MAX_EVOLVE_GENERATIONS);
+		population.evolve(params.getMaxEvolveIterations());
 		
 		PrintStatus();
 	}
@@ -150,22 +149,12 @@ public class SearchProgram extends Thread{
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
 	}
 
-	public void setCrossOverParam(double crossOverParam) {
-	
-		this.CROSS_OVER_LIMIT_RATIO = crossOverParam;
-		this.cop.setRate(crossOverParam);
-	}
-
-	public void setMutationParam(double parameter) {
-		this.MUTATION_LIMIT_RATIO=parameter;
-		mop.setParameter(parameter);
-	}
-
-	
 	public void halt() {
 		// TODO Auto-generated method stub
 		stopped = true;
 		this.stop();
 	}
+
+	
 	
 }

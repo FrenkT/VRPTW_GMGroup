@@ -21,7 +21,7 @@ public class MyGreedyCrossover extends GreedyCrossover {
 	public MyGreedyCrossover(Configuration a_configuration,double rate) throws InvalidConfigurationException {
 		super(a_configuration);
 		
-		if (rate<0 || rate>1)
+		if (rate<0)
 			throw new IllegalArgumentException("Invalid rate specified");
 		
 		m_rate=rate;
@@ -29,7 +29,7 @@ public class MyGreedyCrossover extends GreedyCrossover {
 	
 	public void setRate(double rate)
 	{
-		if (rate<0 || rate>1)
+		if (rate<0)
 			throw new IllegalArgumentException("Invalid rate specified");
 		this.m_rate=rate;
 	}
@@ -41,6 +41,10 @@ public class MyGreedyCrossover extends GreedyCrossover {
 	
 	@Override
 	public void operate(final Population a_population, final List a_candidateChromosomes) {
+		
+		System.out.println("---- Invoked GreedyCrossover with Params:");
+		System.out.println("---- m_rate: "+m_rate);
+		
 		int size = Math.min(getConfiguration().getPopulationSize(),
 				a_population.size());
 		int numCrossovers = (int)(size * m_rate);

@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.GMGroup.Genetic.MySearchParameters;
 import com.GMGroup.Genetic.SearchProgram;
 import com.sun.org.apache.xml.internal.utils.StopParseException;
 
@@ -52,13 +53,14 @@ import javax.swing.JScrollPane;
 import java.awt.Color;
 
 import javax.swing.border.LineBorder;
+import javax.swing.JCheckBox;
 
 public class MainFrame extends JFrame implements TabuSearchListener{
 
 	private JPanel contentPane;
-	private JTextField populationSizeParam;
-	private JTextField crossOverParam;
-	private JTextField mutationParam;
+	private JTextField initialPopulationInput;
+	private JTextField crossOverLimitRatioInput;
+	private JTextField alphaParamInput;
 	private JComboBox<String> cbFileList;
 	
 	private static MainFrame instance;
@@ -95,10 +97,13 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	 * Create the frame.
 	 */
 	private JLabel lblCurrentTopVal=null;
+	private MySearchParameters currentParams;
+	
 	public MainFrame() {
+		currentParams=new MySearchParameters();
 		setTitle("GiudaMorto UI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 254, 331);
+		setBounds(100, 100, 281, 509);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -115,28 +120,24 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		
 		JLabel lblEvolveStatusValue = new JLabel("NA");
 		
-		JLabel lblCurrentTop = new JLabel("Current TOP:");
+		JLabel lblCurrentTop = new JLabel("TopResult:");
 		
 		lblCurrentTopVal = new JLabel("NA");
 		
 		JLabel lblCrossoverParam = new JLabel("Population Size:");
 		
-		JLabel label = new JLabel("CrossOver Param:");
+		JLabel lblCrossover = new JLabel("CrossOverLimit Ratio:");
 		
-		JLabel lblMutationparam = new JLabel("MutationParam:");
+		JLabel lblMutationparam = new JLabel("Mutation Alpha:");
 		
-		populationSizeParam = new JTextField();
-		populationSizeParam.setColumns(10);
+		initialPopulationInput = new JTextField();
+		initialPopulationInput.setColumns(10);
 		
-		crossOverParam = new JTextField();
-		crossOverParam.setColumns(10);
+		crossOverLimitRatioInput = new JTextField();
+		crossOverLimitRatioInput.setColumns(10);
 		
-		mutationParam = new JTextField();
-		mutationParam.setColumns(10);
-		
-		populationSizeParam.setText(""+SearchProgram.popSize);
-		crossOverParam.setText(""+SearchProgram.CROSS_OVER_LIMIT_RATIO);
-		mutationParam.setText(""+SearchProgram.MUTATION_LIMIT_RATIO);
+		alphaParamInput = new JTextField();
+		alphaParamInput.setColumns(10);
 		
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -147,8 +148,29 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		final JButton btnStop = new JButton("Stop");
 		splitPane.setRightComponent(btnStop);
 		
-		cbFileList = new JComboBox();
-			
+		cbFileList = new JComboBox<String>();
+		
+		JLabel lblMaxEvolveIterations = new JLabel("Max Evolve Iterations:");
+		
+		maxEvolveIterationsInput = new JTextField();
+		maxEvolveIterationsInput.setColumns(10);
+		
+		numOfKChainSwapsInput = new JTextField();
+		numOfKChainSwapsInput.setColumns(10);
+		
+		JLabel lblKchainSwaps = new JLabel("KChain Swaps:");
+		
+		tabuNonImprovingThresholdInput = new JTextField();
+		tabuNonImprovingThresholdInput.setColumns(10);
+		JLabel lblTabuNonImproving = new JLabel("<html>Tabu Non Improving Iteration Threshold:</html>");
+		
+		JLabel lblTabuDeltaThreshold = new JLabel("Tabu Delta Threshold:");
+		
+		tabuDeltaThresholdInput = new JTextField();
+		tabuDeltaThresholdInput.setColumns(10);
+		
+		final JCheckBox chkbxStopAt5 = new JCheckBox("Stop at 5 mins");
+		chkbxStopAt5.setSelected(true);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -157,81 +179,113 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(10)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblTimeElapsed)
-									.addGap(121)
-									.addComponent(lblElapsedTimeVal))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblNewLabel_1)
-									.addGap(133)
-									.addComponent(lblStartedAtValue))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblEvolveStatus)
-									.addGap(117)
-									.addComponent(lblEvolveStatusValue))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblCurrentTop)
-									.addGap(123)
-									.addComponent(lblCurrentTopVal))
-								.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblCrossoverParam)
-									.addGap(39)
-									.addComponent(populationSizeParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(label)
-									.addGap(27)
-									.addComponent(crossOverParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblMutationparam)
-									.addGap(39)
-									.addComponent(mutationParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(lblTimeElapsed)
+								.addComponent(lblNewLabel_1)
+								.addComponent(lblEvolveStatus)
+								.addComponent(lblCurrentTop))
+							.addGap(105)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblCurrentTopVal)
+								.addComponent(lblEvolveStatusValue)
+								.addComponent(lblStartedAtValue)
+								.addComponent(lblElapsedTimeVal)))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(673, Short.MAX_VALUE))
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblCrossover)
+								.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(lblKchainSwaps, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblMaxEvolveIterations, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblMutationparam))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblCrossoverParam, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+										.addComponent(maxEvolveIterationsInput, Alignment.LEADING)
+										.addComponent(initialPopulationInput, Alignment.LEADING)
+										.addComponent(crossOverLimitRatioInput, Alignment.LEADING)
+										.addComponent(alphaParamInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+										.addComponent(numOfKChainSwapsInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+										.addComponent(tabuNonImprovingThresholdInput, Alignment.LEADING)
+										.addComponent(tabuDeltaThresholdInput, Alignment.LEADING)))))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblTabuDeltaThreshold))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(chkbxStopAt5)))
+					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(19)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblTimeElapsed)
 						.addComponent(lblElapsedTimeVal))
-					.addGap(6)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_1)
 						.addComponent(lblStartedAtValue))
-					.addGap(6)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblEvolveStatus)
 						.addComponent(lblEvolveStatusValue))
-					.addGap(6)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblCurrentTop)
 						.addComponent(lblCurrentTopVal))
-					.addGap(6)
-					.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(6)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(5)
-							.addComponent(lblCrossoverParam))
-						.addComponent(populationSizeParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(2)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(3)
-							.addComponent(label))
-						.addComponent(crossOverParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(3)
-							.addComponent(lblMutationparam))
-						.addComponent(mutationParam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
+					.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(18)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblCrossoverParam)
+								.addComponent(initialPopulationInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(32)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblCrossover)
+								.addComponent(crossOverLimitRatioInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblMutationparam)
+								.addComponent(alphaParamInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblKchainSwaps)
+								.addComponent(numOfKChainSwapsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(44)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblMaxEvolveIterations)
+								.addComponent(maxEvolveIterationsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tabuNonImprovingThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblTabuDeltaThreshold)
+						.addComponent(tabuDeltaThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(chkbxStopAt5)
+					.addGap(9)
 					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(63))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
 		
@@ -257,14 +311,16 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					int initialPopSize = Integer.parseInt(populationSizeParam.getText());
-					double cop=Double.parseDouble(crossOverParam.getText());
-					double mop = Double.parseDouble(mutationParam.getText());
+					// Setting up parameters
+					currentParams.setAlphaParameterKChain(Double.parseDouble(alphaParamInput.getText()));
+					currentParams.setCrossOverLimitRatio(Double.parseDouble(crossOverLimitRatioInput.getText()));
+					currentParams.setInitialPopulationSize(Integer.parseInt(initialPopulationInput.getText()));
+					currentParams.setMaxEvolveIterations(Integer.parseInt(maxEvolveIterationsInput.getText()));
+					currentParams.setNumOfKChainSwap(Integer.parseInt(numOfKChainSwapsInput.getText()));
+					currentParams.setTabuNonImprovingThresold(Integer.parseInt(tabuNonImprovingThresholdInput.getText()));
+					currentParams.setTabuDeltaRatio(Double.parseDouble(tabuDeltaThresholdInput.getText()));
 					
-					sp = new SearchProgram(cbFileList.getSelectedItem().toString(),Integer.parseInt(populationSizeParam.getText()));
-					sp.setCrossOverParam(cop);
-					sp.setMutationParam(mop);
-					
+					sp = new SearchProgram(cbFileList.getSelectedItem().toString(),currentParams);
 					
 					btnStart.setEnabled(false);
 					btnStop.setEnabled(true);
@@ -286,17 +342,20 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					t.schedule(new ClockUpdater(now,lblElapsedTimeVal), 0, 1000);
 					
 					// Stop this Thread after 5 minutes
-					Timer gameOver = new Timer();
-					gameOver.schedule(new TimerTask(){
-
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							sp.halt();
-							t.cancel();
-						}
-						
-					}, MAX_TIMEOUT); // Stop after 
+					if (chkbxStopAt5.isSelected())
+					{
+						Timer gameOver = new Timer();
+						gameOver.schedule(new TimerTask(){
+	
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								sp.halt();
+								t.cancel();
+							}
+							
+						}, MAX_TIMEOUT); // Stop after 
+					}
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -308,9 +367,21 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		});	
 		
 		
+		// Default values
+		alphaParamInput.setText(""+currentParams.getAlphaParameterKChain());
+		initialPopulationInput.setText(""+currentParams.getInitialPopulationSize());
+		maxEvolveIterationsInput.setText(""+currentParams.getMaxEvolveIterations());
+		numOfKChainSwapsInput.setText(""+currentParams.getNumOfKChainSwap());
+		tabuNonImprovingThresholdInput.setText(""+currentParams.getTabuNonImprovingThresold());
+		tabuDeltaThresholdInput.setText(""+currentParams.getTabuDeltaRatio());
+		crossOverLimitRatioInput.setText(""+currentParams.getCrossOverLimitRatio());
 	}
 
 	private SearchProgram sp = null;
+	private JTextField maxEvolveIterationsInput;
+	private JTextField numOfKChainSwapsInput;
+	private JTextField tabuNonImprovingThresholdInput;
+	private JTextField tabuDeltaThresholdInput;
 	
 	@Override
 	public void tabuSearchStarted(TabuSearchEvent e) {

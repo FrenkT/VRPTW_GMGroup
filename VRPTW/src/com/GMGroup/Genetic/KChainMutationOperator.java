@@ -1,6 +1,7 @@
 package com.GMGroup.Genetic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jgap.Configuration;
@@ -15,11 +16,12 @@ import org.jgap.impl.SwappingMutationOperator;
 
 public class KChainMutationOperator extends SwappingMutationOperator{
 	
-	//default value= 0.04
 	/**
 	 * Expresses which divergence threshold
 	 */
-	private double parameter=0.015;
+	private double alfa=5;
+	private double highValue=0.4;
+	private double lowValue=0.06;
 
 	public KChainMutationOperator() throws InvalidConfigurationException {
 		super();
@@ -47,14 +49,27 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
+		
+		System.out.println("---- Invoked KChainMutationOperator with Params:");
+		System.out.println("---- alfa: "+alfa);
+		System.out.println("---- Numofswaps: "+getMutationRate());
+		
 		//MyFitnessFunction valuta= new MyFitnessFunction();
-		double media=0;
+		double bestFit=0,worstFit=0,parameter1=0,teta=0,mutationProbability;
+		List<Double> fitnessFunctions=new ArrayList<Double>();
 		for(int i=0; i<a_candidateChromosomes.size(); i++){
 			IChromosome c= (IChromosome) a_candidateChromosomes.get(i);
-			media+=c.getFitnessValue();
+			fitnessFunctions.add(c.getFitnessValue());
 			//System.out.println("Fitness:" + c.getFitnessValue());
 			}
-		media= media/a_candidateChromosomes.size(); //ho la media di tutte le fitness function di un tutti i cromosomi della lista
+		Collections.sort(fitnessFunctions);
+		worstFit=fitnessFunctions.get(0);
+		bestFit=fitnessFunctions.get(fitnessFunctions.size()-1);
+		parameter1=1-((worstFit-bestFit)/bestFit)*alfa;
+		teta=Math.max(0, parameter1);
+		mutationProbability=teta*(highValue-lowValue)+lowValue;
+		//System.out.println("mutationProbability:" + mutationProbability);
+		//media= media/a_candidateChromosomes.size(); //ho la media di tutte le fitness function di un tutti i cromosomi della lista
 													// (parents + offspings)
 		//System.out.println("Media:" + media);
 		
@@ -81,28 +96,16 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		// to decide whether to mutate them. Instead, we only make a copy
 		// once we've positively decided to perform a mutation.
 		// ----------------------------------------------------------------
-		int size = a_population.size()/2;
-		/**
-		 * Applico la mutazione solo ai parents che hanno una fitness molto simile alla media
-		 */
-		int n_mutati=0;
+		int size = a_population.size();
 		for (int i = 0; i < size; i++) {
-			IChromosome x = a_population.getChromosome(i);
-			double scarto= media/x.getFitnessValue();
-			scarto=1-Math.abs(scarto);
-			//System.out.println("Scarto: " + scarto);
-			
-			if(Math.abs(scarto)<parameter){ //bisogna parametrizzare quel valore
-				// This returns null if not mutated:
-				IChromosome xm = operate(x, currentRate, generator);//qui eseguo la mutazione
+			if(mutationProbability<1){
+				IChromosome x = a_population.getChromosome(i);
+				IChromosome xm = operate(x, currentRate, generator);
 				if (xm != null) {
 					a_candidateChromosomes.add(xm);
 				}
-				n_mutati++;
-			}
-				
+			}				
 		}
-		System.out.println("N° cromosomi mutati: " + n_mutati);
 	}
 	
 	
@@ -120,9 +123,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		
 		
 	    int from, first, to;
-	    
-	    
-	    Gene[] genes = a_chrom.getGenes();
+	    Gene[] genes = a_chrom.getGenes(); //TODO: check a_rate == param set before
 
 	    first = a_generator.nextInt(a_chrom.size()); //scelgo a caso il primp gene della k-chain
 	    
@@ -130,12 +131,8 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	    Gene from_value = genes[from];
 
 	    
-	    //Qui effettuo il k-chain, con k=4
-	    
+	    //Qui effettuo il k-chain, con k=a_rate
 	    for(int i=0; i<a_rate-1; i++){
-	    	
-	      
-	      
 	      do {
 	    	  to = a_generator.nextInt(a_chrom.size());
 	      }
@@ -149,32 +146,6 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	    }
 	    genes[first]=from_value;
 
-	    //try {
-	    	//a_chrom.setGenes(genes); // modified chromosome 
-	    //}
-	    //catch (InvalidConfigurationException cex) {
-	    //  throw new Error("Gene type not allowed by constraint checker", cex);
-	    //}
-	    
-	    /*
-	    int toIndex = 0;
-	    Gene[] genes = a_chrom.getGenes();
-	    int fromIndex= a_generator.nextInt(a_chrom.size());
-	    int firstIndex = fromIndex;
-	    
-	    // Mantain a reference to the first swapped item
-	    Gene tmp = genes[fromIndex];
-	    
-	    for (int i=0;i<a_rate;i++)
-	    {
-	    	toIndex = a_generator.nextInt(a_chrom.size());
-	    	tmp = genes[toIndex];
-	    	genes[toIndex] = genes[fromIndex];
-	    	fromIndex = toIndex;
-	    	MyChromosomeFactory.PrintChromosome(a_chrom);
-	    }
-	    genes[firstIndex] = tmp;
-	    */
 	    return a_chrom;
 	}
 	
@@ -184,20 +155,11 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	 */
 	@Override
 	public void setMutationRate(int param){
-		super.setMutationRate(param);
+		super.setMutationRate(param); // TODO check param = a_rate into operate
 	}
 	
-
-	/**
-	 * Set the divergence parameter. This mutation will be applied
-	 * to all chromosomes which lies between +divergence and -divergence.
-	 * @param parameter
-	 */
-	public void setParameter(double parameter)
+	public void setAlpha(double alpha)
 	{
-		if (parameter<0 || parameter > 1)
-			throw new IllegalArgumentException("Invalid parameter specififed");
-		
-		this.parameter=parameter;
+		this.alfa=alpha;
 	}
 }
