@@ -1,13 +1,18 @@
 package com.GMGroup.Genetic;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
@@ -38,7 +43,8 @@ public class SearchProgram extends Thread{
 		// ***** Setting up jgap *****
 		Configuration.reset();
 		conf = new DefaultConfiguration();
-		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 0.90d);
+		conf.removeNaturalSelectors(false);
+		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 1.0d);
 		bestChromsSelector.setDoubletteChromosomesAllowed(false);
 		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
@@ -100,20 +106,27 @@ public class SearchProgram extends Thread{
 	@Override
 	public void run()
 	{
-		if (stopped)
-			System.err.println("Cannot start a thread which has been previously stopped.");
-		
-		IChromosome c = population.getFittestChromosome();
-		double res = GMObjectiveFunction.evaluate(c);
-		System.out.println("Best of population Before EVOLVE: "+res);
-		
-		population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
-		
 		try {
-			PrintStatus();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (stopped)
+				System.err.println("Cannot start a thread which has been previously stopped.");
+			
+			IChromosome c = population.getFittestChromosome();
+			double res = GMObjectiveFunction.evaluate(c);
+			System.out.println("Best of population Before EVOLVE: "+res);
+			
+			population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
+			
+			try {
+				PrintStatus();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e)
+		{
 			e.printStackTrace();
+			return;
 		}
 	}
 
@@ -150,35 +163,58 @@ public class SearchProgram extends Thread{
 		
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
 		
+		File outputDir = new File("output");
+		if (!outputDir.isDirectory() || !outputDir.exists())
+		{
+			boolean dirCreated = outputDir.createNewFile();
+			if (!dirCreated)
+				throw new IOException("Cannot create dir "+outputDir.getAbsolutePath());
+		}
+		File outputFile = new File(outputDir,Instance.getInstance().getParameters().getInputFileName()+".csv");
 		
-		CSVWriter writer = new CSVWriter(new FileWriter("data.csv",true));
-		
+		List<String[]> allRes = new ArrayList<String[]>();
+		if (!outputFile.exists())
+		{
+			// Add the header too
+			String[] header = new String[]{
+					"INITIAL_POPULATION_SIZE"
+					,"MAX_EVOLVE_ITERATIONS"
+					,"CROSS_OVER_LIMIT_RATIO"
+					,"MUTATION_ALPHA_PARAM"
+					,"MUTATION_NUM_SWAPS"
+					,"TABU_NON_IMPROVING_ITERATION_TRESHOLD"
+					,"TABU_MIN_IMPROVEMENT_DELTA_%"
+					,"INITIAL_POP_FASIBILITY_%"
+					,"TW_PENALTY"
+					,"CAPACITY_PENALTY"
+					,"BEST_RESULT"
+			};
+			allRes.add(header);
+		}
+		CSVWriter writer = new CSVWriter(new FileWriter(outputFile,true));
 		String[] rsltStr = new String[]{
 				""+params.getInitialPopulationSize()
 				,""+params.getMaxEvolveIterations()
 				,""+params.getCrossOverLimitRatio()
 				,""+params.getAlphaParameterKChain()
 				,""+params.getNumOfKChainSwap()
-				,""
 				,""+params.getTabuNonImprovingThresold()
 				,""+params.getTabuDeltaRatio()
-				,""// MutationProb
+				,""+params.getInitialPopFeasibleChromosomesRatio()
 				,"" + MyFitnessFunction.TimeWPenalty
 				,"" + MyFitnessFunction.CapacityPenalty
-				,""// Empty
 				,""+GMObjectiveFunction.evaluate(best)
 				,""// Time
 		};
-		
-		writer.writeNext(rsltStr);
+		allRes.add(rsltStr);
+		writer.writeAll(allRes);
 		writer.close();
 	}
 
-	
-	
 	public void halt() {
 		// TODO Auto-generated method stub
 		stopped = true;
 		this.stop();
+		
 	}
 }
