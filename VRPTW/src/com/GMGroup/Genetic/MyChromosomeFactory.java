@@ -45,7 +45,7 @@ public class MyChromosomeFactory {
 	private Random rnd;
 	private double MAX_WAITABLE_TIME_RATIO = 0.08;
 	private double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
-	private double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 0;
+	//private double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 0;
 	private Configuration conf;
 	
 	public static MyChromosomeFactory getInstance(Configuration conf) throws InvalidConfigurationException
@@ -257,6 +257,8 @@ public class MyChromosomeFactory {
 		
 		if (customers.size()>0)
 		{
+			throw new Exception("Was not able to generate a feasible chromosome. ");
+			/*
 			int i=0;
 			for (Customer c : customers)
 			{
@@ -277,6 +279,7 @@ public class MyChromosomeFactory {
 				System.err.println("Aborting this chromosome.");
 				throw new IncompleteSolutionException("Some customers haven't been assigned to any vehichle");
 			}
+			*/
 		}
 		
 		

@@ -105,7 +105,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		currentParams=new MySearchParameters();
 		setTitle("GiudaMorto UI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 281, 509);
+		setBounds(100, 100, 305, 575);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -173,11 +173,32 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		
 		final JCheckBox chkbxStopAt5 = new JCheckBox("Stop at 5 mins");
 		chkbxStopAt5.setSelected(true);
+		
+		JLabel lblInitialPopFeas = new JLabel("Initial Pop Feas. Ratio:");
+		
+		feasibilityPercentageInput = new JTextField();
+		feasibilityPercentageInput.setColumns(10);
+		
+		JLabel label = new JLabel("%");
+		
+		JLabel label_1 = new JLabel("%");
+		
+		JLabel label_2 = new JLabel("0...1");
+		
+		JLabel label_3 = new JLabel("#");
+		
+		JLabel label_4 = new JLabel("#");
+		
+		JLabel label_5 = new JLabel("#");
+		
+		JLabel label_6 = new JLabel("#");
+		
+		JLabel label_7 = new JLabel("#");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(10)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -193,41 +214,58 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 								.addComponent(lblElapsedTimeVal)))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblCrossover)
-								.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(lblKchainSwaps, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(lblMaxEvolveIterations, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblMutationparam))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblCrossoverParam, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(maxEvolveIterationsInput, Alignment.LEADING)
-										.addComponent(initialPopulationInput, Alignment.LEADING)
-										.addComponent(crossOverLimitRatioInput, Alignment.LEADING)
-										.addComponent(alphaParamInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
-										.addComponent(numOfKChainSwapsInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
-										.addComponent(tabuNonImprovingThresholdInput, Alignment.LEADING)
-										.addComponent(tabuDeltaThresholdInput, Alignment.LEADING)))))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblTabuDeltaThreshold))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
 							.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 236, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(chkbxStopAt5)))
+							.addComponent(chkbxStopAt5))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addContainerGap()
+											.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+												.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+												.addGroup(gl_contentPane.createSequentialGroup()
+													.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+														.addComponent(lblCrossoverParam, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
+														.addComponent(lblTabuDeltaThreshold))
+													.addPreferredGap(ComponentPlacement.RELATED)
+													.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+														.addComponent(maxEvolveIterationsInput, Alignment.LEADING)
+														.addComponent(initialPopulationInput, Alignment.LEADING)
+														.addComponent(crossOverLimitRatioInput, Alignment.LEADING)
+														.addComponent(alphaParamInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+														.addComponent(numOfKChainSwapsInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+														.addComponent(tabuNonImprovingThresholdInput, Alignment.LEADING)
+														.addComponent(tabuDeltaThresholdInput, Alignment.LEADING)
+														.addComponent(feasibilityPercentageInput, Alignment.LEADING)))))
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addContainerGap()
+											.addComponent(lblInitialPopFeas))
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addContainerGap()
+											.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblCrossover)
+												.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE))))
+									.addGroup(gl_contentPane.createSequentialGroup()
+										.addContainerGap()
+										.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+											.addComponent(lblKchainSwaps, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(lblMaxEvolveIterations, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(lblMutationparam)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(label_7, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_6, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_4, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_3)
+								.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 11, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label)
+								.addComponent(label_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
 					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
@@ -259,37 +297,49 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							.addGap(18)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblCrossoverParam)
-								.addComponent(initialPopulationInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(initialPopulationInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_6))
 							.addGap(32)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblCrossover)
-								.addComponent(crossOverLimitRatioInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(crossOverLimitRatioInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_2))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblMutationparam)
-								.addComponent(alphaParamInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(alphaParamInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_7))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblKchainSwaps)
-								.addComponent(numOfKChainSwapsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(numOfKChainSwapsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_4)))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(44)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblMaxEvolveIterations)
-								.addComponent(maxEvolveIterationsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(maxEvolveIterationsInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_5))))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tabuNonImprovingThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tabuNonImprovingThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_3))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tabuDeltaThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblTabuDeltaThreshold)
-						.addComponent(tabuDeltaThresholdInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(label_1))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblInitialPopFeas)
+						.addComponent(feasibilityPercentageInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label))
+					.addPreferredGap(ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
 					.addComponent(chkbxStopAt5)
-					.addGap(9)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap())
 		);
 		contentPane.setLayout(gl_contentPane);
 		
@@ -305,17 +355,6 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					gameOverTT.run();
 					gameOver.cancel();
 				}
-				
-				/*
-				if (sp==null || sp.isInterrupted())
-				{
-					return;
-				}
-				else
-				{
-					sp.halt();
-				}
-				*/
 			}
 		});
 
@@ -331,6 +370,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 					currentParams.setNumOfKChainSwap(Integer.parseInt(numOfKChainSwapsInput.getText()));
 					currentParams.setTabuNonImprovingThresold(Integer.parseInt(tabuNonImprovingThresholdInput.getText()));
 					currentParams.setTabuDeltaRatio(Double.parseDouble(tabuDeltaThresholdInput.getText()));
+					currentParams.setInitialPopFeasibleChromosomesRatio(Double.parseDouble(feasibilityPercentageInput.getText()));
 					
 					sp = new SearchProgram(cbFileList.getSelectedItem().toString(),currentParams);
 					
@@ -392,6 +432,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		tabuNonImprovingThresholdInput.setText(""+currentParams.getTabuNonImprovingThresold());
 		tabuDeltaThresholdInput.setText(""+currentParams.getTabuDeltaRatio());
 		crossOverLimitRatioInput.setText(""+currentParams.getCrossOverLimitRatio());
+		feasibilityPercentageInput.setText(""+currentParams.getInitialPopFeasibleChromosomesRatio());
 	}
 
 	private SearchProgram sp = null;
@@ -399,6 +440,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private JTextField numOfKChainSwapsInput;
 	private JTextField tabuNonImprovingThresholdInput;
 	private JTextField tabuDeltaThresholdInput;
+	private JTextField feasibilityPercentageInput;
 	
 	@Override
 	public void tabuSearchStarted(TabuSearchEvent e) {
