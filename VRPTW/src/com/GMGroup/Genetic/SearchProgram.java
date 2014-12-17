@@ -52,16 +52,7 @@ public class SearchProgram extends Thread{
 		mop.setAlpha(params.getAlphaParameterKChain());
 		mop.setMutationRate(params.getNumOfKChainSwap());
 		conf.addGeneticOperator(mop);
-		/*
-		 * currentParams.setAlphaParameterKChain(Double.parseDouble(alphaParamInput.getText()));
-					currentParams.setCrossOverLimitRatio(Double.parseDouble(crossOverLimitRatioInput.getText()));
-					currentParams.setCrossOverLimitRatio(Double.parseDouble(initialPopulationInput.getText()));
-					currentParams.setMaxEvolveIterations(Integer.parseInt(maxEvolveIterationsInput.getText()));
-					currentParams.setNumOfKChainSwap(Integer.parseInt(numOfKChainSwapsInput.getText()));
-					currentParams.setTabuNonImprovingThresold(Integer.parseInt(tabuNonImprovingThresholdInput.getText()));
-					currentParams.setTabuDeltaRatio(Integer.parseInt(tabuDeltaThresholdInput.getText()));
-					
-		 */
+
 		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
 		
 		conf.addGeneticOperator(top);
@@ -70,34 +61,35 @@ public class SearchProgram extends Thread{
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
 		
-		int algorithmCount = 0;
-		int randomCount=0;
-		int feasibleAlg=0;
-		int feasibleRan=0;
-		for (int i=0;i<initialPop.length;i++)
+		int feasibleTarget = (int)params.getInitialPopFeasibleChromosomesRatio()/100*params.getInitialPopulationSize();
+		int rndTarget = params.getInitialPopulationSize()-feasibleTarget;
+		int generatedChroms = 0;
+		
+		for (int i=0;i<feasibleTarget;i++)
 		{
 			try {
-				initialPop[i]=factory.generateInitialFeasibleChromosome();
-				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
-				{
-					feasibleAlg++;
-				}
-				algorithmCount++;
+				initialPop[generatedChroms]=factory.generateInitialFeasibleChromosome();
+				generatedChroms++;
 			}
-			catch (Exception IncompleteSolutionException)
+			catch(Exception ex)
 			{
-				initialPop[i]=factory.generateInitialRandomChromosome();
-				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
-				{
-					feasibleRan++;
-				}
-				randomCount++;
+				System.out.println("Chromosme not feasible. Generating a random one instead.");
+				rndTarget++;
 			}
-			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
+		
+		for (int i=0;i<rndTarget;i++)
+		{
+			initialPop[generatedChroms]=factory.generateInitialRandomChromosome();
+			generatedChroms++;
+		}
+		
+		for (IChromosome c : initialPop)
+			System.out.println("Feasible: "+MyChromosomeFactory.getIsChromosomeFeasible(c)+", Fitness: "+GMObjectiveFunction.evaluate(c)+","+MyChromosomeFactory.PrintChromosome(c));
+		
 		System.out.println("*************** INITIAL POPULATION FUNDED ***************");
-		System.out.println("*********  GeneretadWithTheAlgorithmCount: "+algorithmCount+" Feasible: "+feasibleAlg+"  *********");
-		System.out.println("**************  GeneratedRandomCount: "+randomCount+" Feasible: "+feasibleRan+"  *********");
+		System.out.println("*********  Feasible ones: "+(params.getInitialPopulationSize()-rndTarget)+" *********");
+		System.out.println("**************  GeneratedRandomCount: "+rndTarget+"  *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(params.getInitialPopulationSize());
@@ -180,8 +172,6 @@ public class SearchProgram extends Thread{
 		
 		writer.writeNext(rsltStr);
 		writer.close();
-		//ProcessBuilder pb = new ProcessBuilder("data.csv");
-		//pb.start();
 	}
 
 	

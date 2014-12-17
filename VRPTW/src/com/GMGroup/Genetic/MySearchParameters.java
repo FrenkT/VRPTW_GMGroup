@@ -51,6 +51,14 @@ public class MySearchParameters {
 	 */
 	private double tabuDeltaRatio=0.00001;
 
+	
+	/**
+	 * Defines the percentage of feasible chromosomes that should compose the initial population.
+	 * The Factory tries to generate as many feasible chromosome as requested, but if not-feasible 
+	 * solution were found, it would generate a random one.
+	 */
+	private double initialPopFeasibleChromosomesRatio = 50;
+	
 	/**
 	 * @return the tabuDeltaRatio
 	 */
@@ -147,6 +155,23 @@ public class MySearchParameters {
 	 */
 	public void setInitialPopulationSize(int initialPopulationSize) {
 		this.initialPopulationSize = initialPopulationSize;
+	}
+
+	/**
+	 * @return the initialPopFeasibleChromosomesRatio
+	 */
+	public double getInitialPopFeasibleChromosomesRatio() {
+		return initialPopFeasibleChromosomesRatio;
+	}
+
+	/**
+	 * @param initialPopFeasibleChromosomesRatio the initialPopFeasibleChromosomesRatio to set
+	 */
+	public void setInitialPopFeasibleChromosomesRatio(
+			double initialPopFeasibleChromosomesRatio) {
+		if (initialPopFeasibleChromosomesRatio<0 || initialPopFeasibleChromosomesRatio>100)
+			throw new IllegalArgumentException("Invalid initialPopFeasibleChromosomesRatio: the value should be between 0 and 100.");
+		this.initialPopFeasibleChromosomesRatio = initialPopFeasibleChromosomesRatio;
 	}
 	
 	
