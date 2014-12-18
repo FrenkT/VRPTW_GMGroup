@@ -55,13 +55,6 @@ public class MyPMXCrossover extends CrossoverOperator{
 		int size = Math.min(getConfiguration().getPopulationSize(),a_population.size());
 		int numCrossovers = 0;
 		numCrossovers = (int) (size/2 * crossoverRate); //numero di volte che eseguo la crossover
-//		if (m_crossoverRate >= 0) {
-//			numCrossovers = size / m_crossoverRate;
-//		} else if (m_crossoverRateCalc != null) {
-//			numCrossovers = size / m_crossoverRateCalc.calculateCurrentRate();
-//		} else {
-//			numCrossovers = (int) (size * m_crossoverRatePercent);
-//		}
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		IGeneticOperatorConstraint constraint = getConfiguration().getJGAPFactory().getGeneticOperatorConstraint();
 		// For each crossover, grab two random chromosomes, pick a random
@@ -103,16 +96,7 @@ public class MyPMXCrossover extends CrossoverOperator{
 			// ----------------------
 			IChromosome firstMate = (IChromosome) chrom1.clone();//primo figlio
 			IChromosome secondMate = (IChromosome) chrom2.clone();//secondo figlio
-			// In case monitoring is active, support it.
-			// -----------------------------------------
-//			if (m_monitorActive) {
-//				firstMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
-//				firstMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
-//				secondMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
-//				secondMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
-//			}
-			// Cross over the chromosomes.
-			// ---------------------------
+
 			doCrossover(firstMate, secondMate, a_candidateChromosomes,generator);
 		}
 		

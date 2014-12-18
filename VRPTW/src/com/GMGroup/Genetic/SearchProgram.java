@@ -5,14 +5,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
-
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
@@ -20,7 +18,7 @@ import com.opencsv.CSVWriter;
 public class SearchProgram extends Thread{
 
 	private boolean stopped=false;
-	private MyGreedyCrossover cop;
+	private MyPMXCrossover cop;
 	private KChainMutationOperator mop;
 	private Configuration conf;
 	private MySearchParameters params;
@@ -43,43 +41,31 @@ public class SearchProgram extends Thread{
 		// ***** Setting up jgap *****
 		Configuration.reset();
 		conf = new DefaultConfiguration();
-		conf.removeNaturalSelectors(false);
-		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 1.0d);
-		bestChromsSelector.setDoubletteChromosomesAllowed(false);
-		conf.addNaturalSelector(bestChromsSelector, false);
-		conf.setFitnessFunction(new MyFitnessFunction());
-		conf.getGeneticOperators().clear();
-		cop = new MyGreedyCrossover(conf);
-		cop.setStartOffset(0);
-		cop.setRate(params.getCrossOverLimitRatio());
-		conf.addGeneticOperator(cop);
-		
-		mop = new KChainMutationOperator(conf);
-		mop.setAlpha(params.getAlphaParameterKChain());
-		mop.setMutationRate(params.getNumOfKChainSwap());
-		conf.addGeneticOperator(mop);
-
-		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
-		
-		conf.addGeneticOperator(top);
 		
 		// ***** Generating an initial population *****
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
 		
-		int feasibleTarget = (int)params.getInitialPopFeasibleChromosomesRatio()/100*params.getInitialPopulationSize();
+		int feasibleTarget =(int)(params.getInitialPopFeasibleChromosomesRatio()/100*params.getInitialPopulationSize());
 		int rndTarget = params.getInitialPopulationSize()-feasibleTarget;
 		int generatedChroms = 0;
+		int feasibleAlg = 0;
+		int feasibleRan = 0;
 		
 		for (int i=0;i<feasibleTarget;i++)
 		{
-			try {
+			try 
+			{
 				initialPop[generatedChroms]=factory.generateInitialFeasibleChromosome();
+				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[generatedChroms]))
+				{
+					feasibleAlg++;
+				}
 				generatedChroms++;
 			}
 			catch(Exception ex)
 			{
-				System.out.println("Chromosme not feasible. Generating a random one instead.");
+				System.out.println("Chromosome not feasible. Generating a random one instead.");
 				rndTarget++;
 			}
 		}
@@ -87,18 +73,36 @@ public class SearchProgram extends Thread{
 		for (int i=0;i<rndTarget;i++)
 		{
 			initialPop[generatedChroms]=factory.generateInitialRandomChromosome();
+			if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[generatedChroms]))
+			{
+				feasibleRan++;
+			}
 			generatedChroms++;
 		}
 		
 		for (IChromosome c : initialPop)
-			System.out.println("Feasible: "+MyChromosomeFactory.getIsChromosomeFeasible(c)+", Fitness: "+GMObjectiveFunction.evaluate(c)+","+MyChromosomeFactory.PrintChromosome(c));
+			System.out.println("Feasible: "+MyChromosomeFactory.getIsChromosomeFeasible(c)+", Route's length: "+GMObjectiveFunction.evaluate(c)+","+MyChromosomeFactory.PrintChromosome(c));
 		
 		System.out.println("*************** INITIAL POPULATION FUNDED ***************");
-		System.out.println("*********  Feasible ones: "+(params.getInitialPopulationSize()-rndTarget)+" *********");
-		System.out.println("**************  GeneratedRandomCount: "+rndTarget+"  *********");
+		System.out.println("*********  GeneratedWithAlgorithm: "+(params.getInitialPopulationSize()-rndTarget)+" Feasible: "+feasibleAlg+" *********");
+		System.out.println("**************  GeneratedRandomCount: "+rndTarget+" Feasible: "+feasibleRan+" *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(params.getInitialPopulationSize());
+		conf.removeNaturalSelectors(false);
+		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 1.0d);
+		bestChromsSelector.setDoubletteChromosomesAllowed(false);
+		conf.addNaturalSelector(bestChromsSelector, false);
+		conf.setFitnessFunction(new MyFitnessFunction());
+		conf.getGeneticOperators().clear();
+		cop = new MyPMXCrossover(conf,params.getCrossOverLimitRatio(),40);
+		conf.addGeneticOperator(cop);
+		mop = new KChainMutationOperator(conf);
+		mop.setAlpha(params.getAlphaParameterKChain());
+		mop.setMutationRate(params.getNumOfKChainSwap());
+		conf.addGeneticOperator(mop);
+		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
+		conf.addGeneticOperator(top);
 		population = new Genotype(conf,initialPop);
 		
 	}

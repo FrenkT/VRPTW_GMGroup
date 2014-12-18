@@ -2,50 +2,31 @@ package com.GMGroup.Genetic;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import java.util.UUID;
 
-import org.jgap.BaseChromosome;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
-import org.jgap.IGeneConstraintChecker;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
+import org.jgap.RandomGenerator;
 import org.jgap.impl.IntegerGene;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.mdvrp.Customer;
-import com.mdvrp.Depot;
 import com.mdvrp.Instance;
-import com.mdvrp.Parameters;
-import com.mdvrp.Vehicle;
 
 public class MyChromosomeFactory {
 
 	private static final boolean DEBUG = false;
 	private static MyChromosomeFactory instance;
 	private Random rnd;
-	private double MAX_WAITABLE_TIME_RATIO = 0.08;
-	private double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
-	private double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
+	private static final double MAX_WAITABLE_TIME_RATIO = 0.08;
+	private static final double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
+	private static final double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
 	private Configuration conf;
 	
 	public static MyChromosomeFactory getInstance(Configuration conf) throws InvalidConfigurationException
@@ -91,27 +72,16 @@ public class MyChromosomeFactory {
 	
 	public IChromosome generateInitialRandomChromosome() throws InvalidConfigurationException
 	{
-		ShuffleArray(initialGenes);
+		List<Gene> r = new ArrayList<Gene>();
+		for(Gene g : initialGenes)
+			r.add(g);
+		Collections.shuffle(r);
 		
-		// Costruisco l'oggetto chromosome a partire dai risultati ottenuti.
-		Chromosome res = new Chromosome(conf,initialGenes);
-		//res.setConstraintChecker(constraintChecker);
+		Gene[] gr = r.toArray(new Gene[0]);
+		Chromosome res = new Chromosome(conf,gr);
 		return res;	
-	}
+	}	
 	
-	private void ShuffleArray(Gene[] array)
-	{
-	    Gene temp;
-	    int index;
-	    Random random = new Random();
-	    for (int i = array.length - 1; i > 0; i--)
-	    {
-	        index = random.nextInt(i + 1);
-	        temp = array[index];
-	        array[index] = array[i];
-	        array[i] = temp;
-	    }
-	}
 	
 	//public static final int VEICHLE_MARKER = 0;
 	//private static MyChromosomeContraintChecker constraintChecker = new MyChromosomeContraintChecker();
