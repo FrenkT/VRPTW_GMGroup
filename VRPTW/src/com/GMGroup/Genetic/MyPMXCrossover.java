@@ -46,6 +46,11 @@ public class MyPMXCrossover extends CrossoverOperator{
 	@Override
 	public void operate(final Population a_population, final List a_candidateChromosomes) {
 		
+		
+		System.out.println("---- Invoked PMXCrossover with Params:");
+		System.out.println("---- crossoverRate: "+crossoverRate);
+		System.out.println("---- windowlength: "+windowlength);
+		
 		//eseguo il crossover solo sui parents
 		int size = Math.min(getConfiguration().getPopulationSize(),a_population.size());
 		int numCrossovers = 0;
@@ -67,6 +72,9 @@ public class MyPMXCrossover extends CrossoverOperator{
 		int index1, index2;
 		//seleziono due cromosomi da accoppiare in modo random su tutta la popolazione
 		//faccio questa operazione numCrossovers volte
+		
+		System.out.println("****************** candidate size before crossover: "+a_candidateChromosomes.size());
+		System.out.println("****************** population size before crossover: "+a_population.size());
 		for (int i = 0; i < numCrossovers; i++) {
 			index1 = generator.nextInt(size);
 			index2 = generator.nextInt(size);
@@ -107,6 +115,11 @@ public class MyPMXCrossover extends CrossoverOperator{
 			// ---------------------------
 			doCrossover(firstMate, secondMate, a_candidateChromosomes,generator);
 		}
+		
+		System.out.println("---- PMXCrossover Operator added "+numCrossovers*2+" elements");
+		System.out.println("****************** candidate size after crossover: "+a_candidateChromosomes.size());
+		System.out.println("****************** population size after crossover: "+a_population.size());
+		
 	}
 	
 	
@@ -134,8 +147,8 @@ public class MyPMXCrossover extends CrossoverOperator{
 		int end= begin + windowlength; 
 		//int end = begin + generator.nextInt(firstGenes.length - begin); //seconda linea di cross
 		
-		System.out.println(begin);
-		System.out.println(end);
+//		System.out.println(begin);
+//		System.out.println(end);
 		
 		for(int i=begin; i<end; i++){
 			firstChildGenes[i].setAllele((int) firstGenes[i].getAllele());
