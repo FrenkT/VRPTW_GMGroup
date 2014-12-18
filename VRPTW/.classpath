@@ -4,6 +4,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="EmbeddedLibs"/>
 	<classpathentry kind="lib" path="EmbeddedLibs/jgap.jar" sourcepath="C:/Users/Webking/Dropbox/Condivise UNI/Optimization Algs/Docs/jgap_3/src"/>
-	<classpathentry kind="lib" path="EmbeddedLibs/opencsv-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

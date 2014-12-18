@@ -5,18 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
-
 import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
-import com.opencsv.CSVWriter;
 
 
 public class SearchProgram extends Thread{
@@ -173,7 +170,7 @@ public class SearchProgram extends Thread{
 		
 		File outputFile = new File(MainFrame.outputFileName==null ?  Instance.getInstance().getParameters().getInputFileName()+".csv":MainFrame.outputFileName);
 		
-		List<String[]> allRes = new ArrayList<String[]>();
+		List<String> allRes = new ArrayList<String>();
 		if (!outputFile.exists())
 		{
 			// Add the header too
@@ -192,9 +189,12 @@ public class SearchProgram extends Thread{
 					,"CAPACITY_PENALTY"
 					,"BEST_RESULT"
 			};
-			allRes.add(header);
+			StringBuilder sb = new StringBuilder();
+			for(String s : header)
+				sb.append(s+";");
+			allRes.add(sb.toString());
 		}
-		CSVWriter writer = new CSVWriter(new FileWriter(outputFile,true));
+		FileWriter writer = new FileWriter(outputFile,true);
 		String[] rsltStr = new String[]{
 				Instance.getInstance().getParameters().getInputFileName()
 				,"300" // We always run for 5 minutes
@@ -211,8 +211,14 @@ public class SearchProgram extends Thread{
 				,""+GMObjectiveFunction.evaluate(best)
 				,""// Time
 		};
-		allRes.add(rsltStr);
-		writer.writeAll(allRes);
+		StringBuilder sb = new StringBuilder();
+		for(String s : rsltStr)
+			sb.append(s+";");
+		
+		allRes.add(sb.toString());
+		for (String ls : allRes)
+			writer.write(ls.toString());
+		
 		writer.close();
 	}
 
