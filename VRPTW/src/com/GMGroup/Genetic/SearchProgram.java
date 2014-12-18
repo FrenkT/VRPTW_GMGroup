@@ -1,13 +1,18 @@
 package com.GMGroup.Genetic;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
@@ -38,7 +43,8 @@ public class SearchProgram extends Thread{
 		// ***** Setting up jgap *****
 		Configuration.reset();
 		conf = new DefaultConfiguration();
-		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 0.90d);
+		conf.removeNaturalSelectors(false);
+		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 1.0d);
 		bestChromsSelector.setDoubletteChromosomesAllowed(false);
 		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
@@ -52,16 +58,7 @@ public class SearchProgram extends Thread{
 		mop.setAlpha(params.getAlphaParameterKChain());
 		mop.setMutationRate(params.getNumOfKChainSwap());
 		conf.addGeneticOperator(mop);
-		/*
-		 * currentParams.setAlphaParameterKChain(Double.parseDouble(alphaParamInput.getText()));
-					currentParams.setCrossOverLimitRatio(Double.parseDouble(crossOverLimitRatioInput.getText()));
-					currentParams.setCrossOverLimitRatio(Double.parseDouble(initialPopulationInput.getText()));
-					currentParams.setMaxEvolveIterations(Integer.parseInt(maxEvolveIterationsInput.getText()));
-					currentParams.setNumOfKChainSwap(Integer.parseInt(numOfKChainSwapsInput.getText()));
-					currentParams.setTabuNonImprovingThresold(Integer.parseInt(tabuNonImprovingThresholdInput.getText()));
-					currentParams.setTabuDeltaRatio(Integer.parseInt(tabuDeltaThresholdInput.getText()));
-					
-		 */
+
 		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
 		
 		conf.addGeneticOperator(top);
@@ -70,34 +67,35 @@ public class SearchProgram extends Thread{
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
 		
-		int algorithmCount = 0;
-		int randomCount=0;
-		int feasibleAlg=0;
-		int feasibleRan=0;
-		for (int i=0;i<initialPop.length;i++)
+		int feasibleTarget = (int)params.getInitialPopFeasibleChromosomesRatio()/100*params.getInitialPopulationSize();
+		int rndTarget = params.getInitialPopulationSize()-feasibleTarget;
+		int generatedChroms = 0;
+		
+		for (int i=0;i<feasibleTarget;i++)
 		{
 			try {
-				initialPop[i]=factory.generateInitialFeasibleChromosome();
-				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
-				{
-					feasibleAlg++;
-				}
-				algorithmCount++;
+				initialPop[generatedChroms]=factory.generateInitialFeasibleChromosome();
+				generatedChroms++;
 			}
-			catch (Exception IncompleteSolutionException)
+			catch(Exception ex)
 			{
-				initialPop[i]=factory.generateInitialRandomChromosome();
-				if (MyChromosomeFactory.getIsChromosomeFeasible(initialPop[i]))
-				{
-					feasibleRan++;
-				}
-				randomCount++;
+				System.out.println("Chromosme not feasible. Generating a random one instead.");
+				rndTarget++;
 			}
-			System.out.println("Age:"+initialPop[i].getAge()+", Fitness: "+initialPop[i].getAge()+","+MyChromosomeFactory.PrintChromosome(initialPop[i]));
 		}
+		
+		for (int i=0;i<rndTarget;i++)
+		{
+			initialPop[generatedChroms]=factory.generateInitialRandomChromosome();
+			generatedChroms++;
+		}
+		
+		for (IChromosome c : initialPop)
+			System.out.println("Feasible: "+MyChromosomeFactory.getIsChromosomeFeasible(c)+", Fitness: "+GMObjectiveFunction.evaluate(c)+","+MyChromosomeFactory.PrintChromosome(c));
+		
 		System.out.println("*************** INITIAL POPULATION FUNDED ***************");
-		System.out.println("*********  GeneretadWithTheAlgorithmCount: "+algorithmCount+" Feasible: "+feasibleAlg+"  *********");
-		System.out.println("**************  GeneratedRandomCount: "+randomCount+" Feasible: "+feasibleRan+"  *********");
+		System.out.println("*********  Feasible ones: "+(params.getInitialPopulationSize()-rndTarget)+" *********");
+		System.out.println("**************  GeneratedRandomCount: "+rndTarget+"  *********");
 		System.out.println("*********************************************************");
 		conf.setSampleChromosome(initialPop[0]);
 		conf.setPopulationSize(params.getInitialPopulationSize());
@@ -108,20 +106,27 @@ public class SearchProgram extends Thread{
 	@Override
 	public void run()
 	{
-		if (stopped)
-			System.err.println("Cannot start a thread which has been previously stopped.");
-		
-		IChromosome c = population.getFittestChromosome();
-		double res = GMObjectiveFunction.evaluate(c);
-		System.out.println("Best of population Before EVOLVE: "+res);
-		
-		population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
-		
 		try {
-			PrintStatus();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			if (stopped)
+				System.err.println("Cannot start a thread which has been previously stopped.");
+			
+			IChromosome c = population.getFittestChromosome();
+			double res = GMObjectiveFunction.evaluate(c);
+			System.out.println("Best of population Before EVOLVE: "+res);
+			
+			population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
+			
+			try {
+				PrintStatus();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e)
+		{
 			e.printStackTrace();
+			return;
 		}
 	}
 
@@ -158,37 +163,58 @@ public class SearchProgram extends Thread{
 		
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
 		
+		File outputDir = new File("output");
+		if (!outputDir.isDirectory() || !outputDir.exists())
+		{
+			boolean dirCreated = outputDir.createNewFile();
+			if (!dirCreated)
+				throw new IOException("Cannot create dir "+outputDir.getAbsolutePath());
+		}
+		File outputFile = new File(outputDir,Instance.getInstance().getParameters().getInputFileName()+".csv");
 		
-		CSVWriter writer = new CSVWriter(new FileWriter("data.csv",true));
-		
+		List<String[]> allRes = new ArrayList<String[]>();
+		if (!outputFile.exists())
+		{
+			// Add the header too
+			String[] header = new String[]{
+					"INITIAL_POPULATION_SIZE"
+					,"MAX_EVOLVE_ITERATIONS"
+					,"CROSS_OVER_LIMIT_RATIO"
+					,"MUTATION_ALPHA_PARAM"
+					,"MUTATION_NUM_SWAPS"
+					,"TABU_NON_IMPROVING_ITERATION_TRESHOLD"
+					,"TABU_MIN_IMPROVEMENT_DELTA_%"
+					,"INITIAL_POP_FASIBILITY_%"
+					,"TW_PENALTY"
+					,"CAPACITY_PENALTY"
+					,"BEST_RESULT"
+			};
+			allRes.add(header);
+		}
+		CSVWriter writer = new CSVWriter(new FileWriter(outputFile,true));
 		String[] rsltStr = new String[]{
 				""+params.getInitialPopulationSize()
 				,""+params.getMaxEvolveIterations()
 				,""+params.getCrossOverLimitRatio()
 				,""+params.getAlphaParameterKChain()
 				,""+params.getNumOfKChainSwap()
-				,""
 				,""+params.getTabuNonImprovingThresold()
 				,""+params.getTabuDeltaRatio()
-				,""// MutationProb
+				,""+params.getInitialPopFeasibleChromosomesRatio()
 				,"" + MyFitnessFunction.TimeWPenalty
 				,"" + MyFitnessFunction.CapacityPenalty
-				,""// Empty
 				,""+GMObjectiveFunction.evaluate(best)
 				,""// Time
 		};
-		
-		writer.writeNext(rsltStr);
+		allRes.add(rsltStr);
+		writer.writeAll(allRes);
 		writer.close();
-		//ProcessBuilder pb = new ProcessBuilder("data.csv");
-		//pb.start();
 	}
 
-	
-	
 	public void halt() {
 		// TODO Auto-generated method stub
 		stopped = true;
 		this.stop();
+		
 	}
 }

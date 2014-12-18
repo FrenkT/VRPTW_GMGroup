@@ -57,7 +57,10 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		//MyFitnessFunction valuta= new MyFitnessFunction();
 		double bestFit=0,worstFit=0,parameter1=0,teta=0,mutationProbability;
 		List<Double> fitnessFunctions=new ArrayList<Double>();
-		for(int i=0; i<a_candidateChromosomes.size(); i++){
+		int startIndex = a_population.getConfiguration().getPopulationSize();
+        if (startIndex==0)
+        	return;
+		for(int i=startIndex; i<a_candidateChromosomes.size(); i++){
 			IChromosome c= (IChromosome) a_candidateChromosomes.get(i);
 			fitnessFunctions.add(c.getFitnessValue());
 			//System.out.println("Fitness:" + c.getFitnessValue());
@@ -68,7 +71,12 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		parameter1=1-((worstFit-bestFit)/bestFit)*alfa;
 		teta=Math.max(0, parameter1);
 		mutationProbability=teta*(highValue-lowValue)+lowValue;
-		//System.out.println("mutationProbability:" + mutationProbability);
+		System.out.println("****************** candidate size before mutation: "+a_candidateChromosomes.size());
+		System.out.println("****************** population size before mutation: "+a_population.size());
+		System.out.println("****************** worstFit: " + worstFit);
+		System.out.println("****************** bestFit: " + bestFit);
+		System.out.println("****************** parameter1: " + parameter1);
+		System.out.println("****************** mutationProbability:" + mutationProbability);
 		//media= media/a_candidateChromosomes.size(); //ho la media di tutte le fitness function di un tutti i cromosomi della lista
 													// (parents + offspings)
 		//System.out.println("Media:" + media);
@@ -98,8 +106,8 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		// ----------------------------------------------------------------
 		int size = a_population.size();
 		int addedCounter=0;
-		if (mutationProbability < 1) {
-			for (int i = 0; i < size; i++) {
+		if (mutationProbability < 0.45) {
+			for (int i = startIndex; i < size; i++) {
 				IChromosome x = a_population.getChromosome(i);
 				IChromosome xm = operate(x, currentRate, generator);
 				if (xm != null) {
@@ -108,8 +116,10 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 				}
 			}
 		}
-		
 		System.out.println("---- KChainMutation Operator mutated and added "+addedCounter+" elements");
+		
+		System.out.println("****************** candidate size after mutation: "+a_candidateChromosomes.size());
+		System.out.println("****************** population size after mutation: "+a_population.size());
 	}
 	
 	
