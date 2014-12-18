@@ -45,7 +45,7 @@ public class MyChromosomeFactory {
 	private Random rnd;
 	private double MAX_WAITABLE_TIME_RATIO = 0.08;
 	private double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
-	//private double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 0;
+	private double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
 	private Configuration conf;
 	
 	public static MyChromosomeFactory getInstance(Configuration conf) throws InvalidConfigurationException
@@ -122,8 +122,7 @@ public class MyChromosomeFactory {
 	 *  
 	 **/
 	public IChromosome generateInitialFeasibleChromosome() throws Exception
-	{
-		
+	{	
 		Point2D depot = Accelerator.getInstance().getDepotLocaltion();
 		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
 		
@@ -158,6 +157,7 @@ public class MyChromosomeFactory {
 		// Per ogni veicolo, scegliamo un insieme di clienti da caricare fino a riempire le capacità e a rispettare le tw
 		if (DEBUG)
 			System.out.println("Cliente #\tFROM\tTO\tDISTANCE\tElapsed\tService\tAttesa");
+		
 		for (int i=0;i<maxVeichles && customers.size()>0;i++)
 		{
 			double maxWaitableInterval= Accelerator.getInstance().getDepotDueTime();
@@ -166,6 +166,7 @@ public class MyChromosomeFactory {
 			
 			if (DEBUG)
 				System.out.println("============Veicolo "+i+" =============");
+			
 			ArrayList<Integer> veichle = (ArrayList<Integer>)veichles[i];
 			
 			// Scegli un cliente a caso considerando il suo peso
@@ -176,31 +177,30 @@ public class MyChromosomeFactory {
 			double cost = 0;
 			double elapsedTime = 0;
 			double distanceOrTime = 0;
-			Point2D lastCustomerPosition = null;
+			int lastCustomerId = 0;
 			// Scansione circolare
 			for (int w = nextCustomerId;w<customers.size()+nextCustomerId;w++)
 			{
 				nextCustomer = customers.get(w % customers.size());
+				
 				if ((nextCustomer.getCapacity() + cost ) <= capacityPerVeichle)
 				{
 					String toPrint = "";
-					
 					// Se è il primo customer, parti dal depot
-					if (veichle.size()==0)
+					if (veichle.size() == 0)
 					{
 						// Calcolo distanza dal depot
-						lastCustomerPosition = nextCustomer.getLocation();
-						distanceOrTime = depot.distance(lastCustomerPosition);
-						//double time = distanceOrTime * 1;
-						toPrint = (nextCustomer.getNumber()+1)+";"+depot+";"+lastCustomerPosition+";"+distanceOrTime+";"+elapsedTime;
+						lastCustomerId = nextCustomer.getNumber() + 1;
+						distanceOrTime = Accelerator.getInstance().getDistanceBetween(0, lastCustomerId);
+						toPrint = (nextCustomer.getNumber()+1)+";"+depot+";"+lastCustomerId+";"+distanceOrTime+";"+elapsedTime;
 					}
 					else
 					{
 						// Altrimenti parti dall'elemento precedentemente salvato
-						Point2D tmpPoint = nextCustomer.getLocation();
-						distanceOrTime = lastCustomerPosition.distance(tmpPoint);
-						toPrint = (nextCustomer.getNumber()+1)+";"+lastCustomerPosition+";"+tmpPoint+";"+distanceOrTime+";"+elapsedTime;
-						lastCustomerPosition = tmpPoint;
+						int tmpCustomerId = nextCustomer.getNumber() + 1;
+						distanceOrTime = Accelerator.getInstance().getDistanceBetween(lastCustomerId, tmpCustomerId);
+						lastCustomerId = tmpCustomerId;
+						toPrint = (nextCustomer.getNumber()+1)+";"+lastCustomerId+";"+tmpCustomerId+";"+distanceOrTime+";"+elapsedTime;
 					}
 					
 					// Aggiungilo solo se rispetta le tw
@@ -209,29 +209,22 @@ public class MyChromosomeFactory {
 						timeToWait = nextCustomer.getStartTw() - elapsedTime - distanceOrTime;
 						timeToWait = (timeToWait < 0) ? 0 :	timeToWait;
 						
-						if (elapsedTime + distanceOrTime + timeToWait + nextCustomer.getServiceDuration() + depot.distance(lastCustomerPosition) <= depotDueTime)
+						if (elapsedTime + distanceOrTime + timeToWait + nextCustomer.getServiceDuration() + Accelerator.getInstance().getDistanceBetween(0, lastCustomerId) <= depotDueTime)		
 						{
-							toPrint += ";" + nextCustomer.getServiceDuration()+";"+((timeToWait>0 ? timeToWait :"No wait"));
+							toPrint += ";" + nextCustomer.getServiceDuration()+";"+((timeToWait > 0 ? timeToWait :"No wait"));
+							
 							if(DEBUG)
 								System.out.println(toPrint);
+							
 							if (timeToWait > 0) 
 							{
 								// Se il customer corrente richiede un'attesa maggiore della massima concepita, passa al prossimo
 								if (timeToWait > maxWaitableInterval)
 								{
 									if (DEBUG)
-										System.err.println("Veichle "+i+" can't wait for customer "+w+". Moving forward...");
-									if (toRemove.size() > 0)
-									{
-										//int index = veichle.get(veichle.size() - 1);
-										Customer lastAdded = toRemove.get(toRemove.size() - 1);
-										//System.out.println("lastAdded1: "+index+" - lastAdded2: "+(lastAdded.getNumber()+1));
-										lastCustomerPosition = lastAdded.getLocation();
-									}
-									else
-									{
-										lastCustomerPosition = null;
-									}
+										System.err.println("Veichle "+i+" can't wait for customer "+(nextCustomer.getNumber() + 1)+". Moving forward...");
+									
+									lastCustomerId = (veichle.size() > 0) ? veichle.get(veichle.size() - 1) : 0;
 									continue;
 								}
 								// Siamo in attesa
@@ -241,25 +234,29 @@ public class MyChromosomeFactory {
 							elapsedTime += distanceOrTime;
 						
 							veichle.add(nextCustomer.getNumber() + 1);
-							//System.out.println("Added: "+(nextCustomer.getNumber() + 1));
 							cost += nextCustomer.getCapacity();
 						
 							// Remove the added customer
 							toRemove.add(nextCustomer);
 						}
+						else
+						{
+							lastCustomerId = (veichle.size() > 0) ? veichle.get(veichle.size() - 1) : 0;
+						}
+					}
+					else
+					{
+						lastCustomerId = (veichle.size() > 0) ? veichle.get(veichle.size() - 1) : 0;
 					}
 				}
 			}
-			//printCustomers(i, customers);
 			customers.removeAll(toRemove);
 			toRemove.clear();
 		}
 		
-		if (customers.size()>0)
+		if (customers.size() > 0)
 		{
-			throw new Exception("Was not able to generate a feasible chromosome. ");
-			/*
-			int i=0;
+			int i = 0;
 			for (Customer c : customers)
 			{
 				if (i == MAX_UNASSIGNED_ALLOCABLE_VEHICLES)
@@ -273,13 +270,12 @@ public class MyChromosomeFactory {
 			customers.removeAll(toRemove);
 			toRemove.clear();
 			
-			if (customers.size()>0)
+			if (customers.size() > 0)
 			{
 				System.err.println("Unassigned "+customers.size());
 				System.err.println("Aborting this chromosome.");
 				throw new IncompleteSolutionException("Some customers haven't been assigned to any vehichle");
 			}
-			*/
 		}
 		
 		
@@ -340,7 +336,6 @@ public class MyChromosomeFactory {
 		return fb.toString();
 	}
 
-	// forse scazza per il magicnumber
 	/**
 	 * Metodo che controlla se un cromosoma e' feasible oppure no
 	 * @param chrom
@@ -391,7 +386,6 @@ public class MyChromosomeFactory {
 				{
 					entitiesOfViolations[0] += 1;
 					entitiesOfViolations[1] += (actualCost - Instance.getInstance().getCapacity(0, 0));
-					//entitiesOfViolations[1] += arrotonda((actualCost - Instance.getInstance().getCapacity(0, 0)), 3);
 				}
 				
 				actualCost = 0;
@@ -401,44 +395,41 @@ public class MyChromosomeFactory {
 			actualCost += acc.getCustomerDemand(idCustomerA);
 		}
 		
-		Point2D lastCustomerPosition = null;
-		Point2D depotPosition = Accelerator.getInstance().getDepotLocaltion();
 		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
 		double elapsedTime = 0;
 		double distanceOrTime = 0;
 		double timeToWait = 0;
-		//int numVeicoli = 1;
+		//int numVeicoli = 0;
 		boolean veicoloViolaTW = false;
+		int lastCustomerId = 0;
+		
 		// Controllo il rispetto delle time windows
 		for (int i = 0; i < gens.length; i++)
 		{
 			int idCustomer = (int)gens[i].getAllele();
 			
-			if (idCustomer <= 0 /*|| i == (gens.length - 1)*/)
+			if (idCustomer <= 0)
 			{
 				//numVeicoli++;
 				veicoloViolaTW = false;
 				elapsedTime = 0;
-				lastCustomerPosition = null;
+				lastCustomerId = 0;
 				continue;
 			}
 			
-			Customer c = acc.getCustomer(idCustomer);
-			//Customer c2 = Instance.getInstance().getDepot(0).getAssignedCustomer(idCustomer-1);
-			//System.out.println(c.getNumber()+" - "+(c2.getNumber()));
-			
+			Customer c = acc.getCustomer(idCustomer);			
 			double serviceDuration = c.getServiceDuration();
 			
-			if (lastCustomerPosition == null)
+			if (lastCustomerId == 0)
 			{
-				lastCustomerPosition = c.getLocation();
-				distanceOrTime = depotPosition.distance(lastCustomerPosition);
+				lastCustomerId = idCustomer;
+				distanceOrTime = acc.getDistanceBetween(0, idCustomer);
 			}
 			else
 			{
-				Point2D tmpPoint = c.getLocation();
-				distanceOrTime = lastCustomerPosition.distance(tmpPoint);
-				lastCustomerPosition = tmpPoint;
+				int tmpCustomerId = idCustomer;
+				distanceOrTime = acc.getDistanceBetween(lastCustomerId, tmpCustomerId);
+				lastCustomerId = tmpCustomerId;
 			}
 			
 			if ((elapsedTime + distanceOrTime) <= c.getEndTw())
@@ -446,7 +437,7 @@ public class MyChromosomeFactory {
 				timeToWait = c.getStartTw() - elapsedTime - distanceOrTime;
 				timeToWait = (timeToWait < 0) ?	0 : timeToWait;
 				
-				if ((elapsedTime + distanceOrTime + timeToWait + serviceDuration + depotPosition.distance(lastCustomerPosition)) <= depotDueTime)
+				if ((elapsedTime + distanceOrTime + timeToWait + serviceDuration + acc.getDistanceBetween(0, idCustomer)) <= depotDueTime)	
 				{
 					elapsedTime += distanceOrTime;
 					elapsedTime += timeToWait;
@@ -460,8 +451,7 @@ public class MyChromosomeFactory {
 						veicoloViolaTW = true;
 					}
 					entitiesOfViolations[4] += 1;
-					entitiesOfViolations[3] += (elapsedTime + distanceOrTime + timeToWait + serviceDuration + depotPosition.distance(lastCustomerPosition) - depotDueTime);
-					//entitiesOfViolations[3] += arrotonda((elapsedTime + distanceOrTime + timeToWait + serviceDuration + depotPosition.distance(lastCustomerPosition) - depotDueTime), 3);
+					entitiesOfViolations[3] += (elapsedTime + distanceOrTime + timeToWait + serviceDuration + acc.getDistanceBetween(0, idCustomer) - depotDueTime);
 				}
 			
 			}
@@ -474,7 +464,6 @@ public class MyChromosomeFactory {
 				}
 				entitiesOfViolations[4] += 1;
 				entitiesOfViolations[3] += (elapsedTime + distanceOrTime - c.getEndTw());
-				//entitiesOfViolations[3] += arrotonda((elapsedTime + distanceOrTime - c.getEndTw()), 3);
 			}
 		}
 		
