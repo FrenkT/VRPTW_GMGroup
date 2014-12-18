@@ -48,7 +48,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	
 	private static MainFrame instance;
 	
-	public static final int MAX_TIMEOUT = 300000;
+	public static final int MAX_TIMEOUT = 10000;
 	
 	public static MainFrame getInstance()
 	{
@@ -56,7 +56,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	}
 	
 	private static String inputFileName=null;						// Default: null
-	public static String outputFileName="output/solutions.csv";	// Default: "output/solutions.csv"
+	public static String outputFileName="output/solutions.csv";		// Default: "output/solutions.csv"
 	private static int randomSeed=-1;								// Default: random seed
 	/**
 	 * Launch the application.
@@ -402,6 +402,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							// Batch run
 							if (chckbxBatchRun.isSelected())
 							{
+								MainFrame.outputFileName=null; 	// Setting up this param to null will make the algorithm to save results into different files.
 								runs = Integer.parseInt(runsInput.getText());
 								 fnames=new String[]{
 										"rC101.txt",
@@ -454,7 +455,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 											try {
 												sp.PrintStatus();
 												synchronized (sp) {
-													sp.notify();	
+													sp.notify();
 												}
 											} catch (IOException e1) {
 												e1.printStackTrace();

@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -18,6 +17,7 @@ import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
+
 
 public class SearchProgram extends Thread{
 
@@ -35,8 +35,7 @@ public class SearchProgram extends Thread{
 		Parameters parameters = new Parameters();
 		parameters.updateParameters(new String[]{"-if",fileName});
 		if(parameters.getInputFileName() == null){
-			System.out.println("You must specify an input file name");
-			return;
+			throw new IllegalArgumentException("No file name specified in Parameters.");
 		}
 		Instance.setInstance(parameters);
 		Instance instance = Instance.getInstance();
@@ -172,15 +171,7 @@ public class SearchProgram extends Thread{
 		
 		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
 		
-		File outputDir = new File("output");
-		if (!outputDir.isDirectory() || !outputDir.exists())
-		{
-			boolean dirCreated = outputDir.createNewFile();
-			if (!dirCreated)
-				throw new IOException("Cannot create dir "+outputDir.getAbsolutePath());
-		}
-		
-		File outputFile = new File(outputDir,MainFrame.outputFileName==null ? "solutions.csv" : Instance.getInstance().getParameters().getInputFileName()+".csv");
+		File outputFile = new File(MainFrame.outputFileName==null ?  Instance.getInstance().getParameters().getInputFileName()+".csv":MainFrame.outputFileName);
 		
 		List<String[]> allRes = new ArrayList<String[]>();
 		if (!outputFile.exists())
