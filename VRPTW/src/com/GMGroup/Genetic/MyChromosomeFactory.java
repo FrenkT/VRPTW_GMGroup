@@ -23,7 +23,6 @@ public class MyChromosomeFactory {
 
 	private static final boolean DEBUG = false;
 	private static MyChromosomeFactory instance;
-	private Random rnd;
 	private static final double MAX_WAITABLE_TIME_RATIO = 0.08;
 	private static final double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
 	private static final double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
@@ -41,7 +40,6 @@ public class MyChromosomeFactory {
 	private MyChromosomeFactory(Configuration conf) throws InvalidConfigurationException
 	{
 		this.conf = conf;
-		rnd= new Random((int)(UUID.randomUUID()).hashCode());
 		int genLen = Instance.getInstance().getCustomersNr()+Instance.getInstance().getVehiclesNr()-1;
 		initialGenes = new IntegerGene[genLen];
 		
@@ -102,7 +100,7 @@ public class MyChromosomeFactory {
 		{
 			if (customers.size()!=0)
 			{
-				int posToInsert = rnd.nextInt(customers.size());
+				int posToInsert = MyRandomGenerator.getInstance().nextInt(customers.size());
 				customers.add(posToInsert,c);
 			}
 			else
@@ -140,7 +138,7 @@ public class MyChromosomeFactory {
 			ArrayList<Integer> veichle = (ArrayList<Integer>)veichles[i];
 			
 			// Scegli un cliente a caso considerando il suo peso
-			int nextCustomerId = rnd.nextInt(customers.size());
+			int nextCustomerId = MyRandomGenerator.getInstance().nextInt(customers.size());
 			Customer nextCustomer = null;
 			
 			double timeToWait = 0;

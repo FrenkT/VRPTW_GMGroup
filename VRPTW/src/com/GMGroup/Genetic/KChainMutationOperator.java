@@ -3,7 +3,6 @@ package com.GMGroup.Genetic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -11,7 +10,6 @@ import org.jgap.IUniversalRateCalculator;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
-import org.jgap.impl.GABreeder;
 import org.jgap.impl.SwappingMutationOperator;
 
 public class KChainMutationOperator extends SwappingMutationOperator{

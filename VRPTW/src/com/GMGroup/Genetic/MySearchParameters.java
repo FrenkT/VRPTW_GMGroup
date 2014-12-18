@@ -53,6 +53,13 @@ public class MySearchParameters {
 
 	
 	/**
+	 * Represents the window size of the PMXCrossOver. The larger, the less genes will be moved within
+	 * a single crossover.
+	 */
+	private int crossOverWindowWidth=40;
+	
+	
+	/**
 	 * Defines the percentage of feasible chromosomes that should compose the initial population.
 	 * The Factory tries to generate as many feasible chromosome as requested, but if not-feasible 
 	 * solution were found, it would generate a random one.
@@ -172,6 +179,22 @@ public class MySearchParameters {
 		if (initialPopFeasibleChromosomesRatio<0 || initialPopFeasibleChromosomesRatio>100)
 			throw new IllegalArgumentException("Invalid initialPopFeasibleChromosomesRatio: the value should be between 0 and 100.");
 		this.initialPopFeasibleChromosomesRatio = initialPopFeasibleChromosomesRatio;
+	}
+
+	/**
+	 * @return the crossOverWindowWidth
+	 */
+	public int getCrossOverWindowWidth() {
+		return crossOverWindowWidth;
+	}
+
+	/**
+	 * @param crossOverWindowWidth the crossOverWindowWidth to set
+	 */
+	public void setCrossOverWindowWidth(int crossOverWindowWidth) {
+		if (crossOverWindowWidth<0)
+			throw new IllegalArgumentException("CrossOverWindowWidth cannot be a negative value");
+		this.crossOverWindowWidth = crossOverWindowWidth;
 	}
 	
 	

@@ -5,12 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
+import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 import com.opencsv.CSVWriter;
@@ -23,7 +27,7 @@ public class SearchProgram extends Thread{
 	private Configuration conf;
 	private MySearchParameters params;
 	
-	public SearchProgram(String fileName,MySearchParameters params) throws Exception
+	public SearchProgram(String fileName,int seed,MySearchParameters params) throws Exception
 	{
 		this.params = params;
 		stopped=false;
@@ -37,11 +41,13 @@ public class SearchProgram extends Thread{
 		Instance.setInstance(parameters);
 		Instance instance = Instance.getInstance();
 		instance.populateFromHombergFile(parameters.getInputFileName());
+		// ****** Configuring our random generator ********//
+		MyRandomGenerator.setSeed(seed);
 		
 		// ***** Setting up jgap *****
 		Configuration.reset();
 		conf = new DefaultConfiguration();
-		
+		conf.setRandomGenerator(MyRandomGenerator.getInstance());
 		// ***** Generating an initial population *****
 		MyChromosomeFactory factory = MyChromosomeFactory.getInstance(conf);
 		IChromosome[] initialPop = new IChromosome[params.getInitialPopulationSize()];
@@ -104,7 +110,6 @@ public class SearchProgram extends Thread{
 		TabuOperator top = new TabuOperator(conf,params.getTabuDeltaRatio(),params.getTabuNonImprovingThresold());
 		conf.addGeneticOperator(top);
 		population = new Genotype(conf,initialPop);
-		
 	}
 	Genotype population = null;
 	@Override
@@ -174,14 +179,17 @@ public class SearchProgram extends Thread{
 			if (!dirCreated)
 				throw new IOException("Cannot create dir "+outputDir.getAbsolutePath());
 		}
-		File outputFile = new File(outputDir,Instance.getInstance().getParameters().getInputFileName()+".csv");
+		
+		File outputFile = new File(outputDir,MainFrame.outputFileName==null ? "solutions.csv" : Instance.getInstance().getParameters().getInputFileName()+".csv");
 		
 		List<String[]> allRes = new ArrayList<String[]>();
 		if (!outputFile.exists())
 		{
 			// Add the header too
 			String[] header = new String[]{
-					"INITIAL_POPULATION_SIZE"
+					"INPUT FILE"
+					,"TimeLapsed"
+					,"INITIAL_POPULATION_SIZE"
 					,"MAX_EVOLVE_ITERATIONS"
 					,"CROSS_OVER_LIMIT_RATIO"
 					,"MUTATION_ALPHA_PARAM"
@@ -197,7 +205,9 @@ public class SearchProgram extends Thread{
 		}
 		CSVWriter writer = new CSVWriter(new FileWriter(outputFile,true));
 		String[] rsltStr = new String[]{
-				""+params.getInitialPopulationSize()
+				Instance.getInstance().getParameters().getInputFileName()
+				,"300" // We always run for 5 minutes
+				,""+params.getInitialPopulationSize()
 				,""+params.getMaxEvolveIterations()
 				,""+params.getCrossOverLimitRatio()
 				,""+params.getAlphaParameterKChain()
