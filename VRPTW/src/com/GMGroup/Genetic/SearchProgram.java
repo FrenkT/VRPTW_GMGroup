@@ -93,7 +93,7 @@ public class SearchProgram extends Thread{
 		conf.setPopulationSize(params.getInitialPopulationSize());
 		conf.removeNaturalSelectors(false);
 		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(conf, 1.0d);
-		bestChromsSelector.setDoubletteChromosomesAllowed(false);
+		bestChromsSelector.setDoubletteChromosomesAllowed(true);
 		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
