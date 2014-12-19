@@ -48,7 +48,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	
 	private static MainFrame instance;
 	
-	public static final int MAX_TIMEOUT = 10000;
+	public static final int MAX_TIMEOUT = 300000;
 	
 	public static MainFrame getInstance()
 	{
