@@ -69,8 +69,13 @@ public class MyPMXCrossover extends CrossoverOperator{
 		System.out.println("****************** candidate size before crossover: "+a_candidateChromosomes.size());
 		System.out.println("****************** population size before crossover: "+a_population.size());
 		for (int i = 0; i < numCrossovers; i++) {
-			index1 = generator.nextInt(size);
-			index2 = generator.nextInt(size);
+			//Next 2 lines get parents randomly
+			//index1 = generator.nextInt(size);
+			//index2 = generator.nextInt(size);
+			//after first evolve, chromosomes are ordered by decreasing fitness
+			//next 2 lines get parents by worst-fitness-order
+			index1 = (a_population.size()-(i*2))%a_population.size();     //FIXME albertone
+			index2 = (a_population.size()-(i*2+1))%a_population.size();   //FIXME albertone
 			IChromosome chrom1 = a_population.getChromosome(index1);
 			IChromosome chrom2 = a_population.getChromosome(index2);
 			// Verify that crossover is allowed.
