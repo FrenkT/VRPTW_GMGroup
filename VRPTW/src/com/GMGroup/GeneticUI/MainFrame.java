@@ -2,7 +2,18 @@ package com.GMGroup.GeneticUI;
 
 import java.awt.EventQueue;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.activity.InvalidActivityException;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -16,20 +27,24 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.GMGroup.Genetic.MyChromosomeFactory;
 import com.GMGroup.Genetic.MySearchParameters;
 import com.GMGroup.Genetic.SearchProgram;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.swing.JComboBox;
-
 import org.coinor.opents.TabuSearchEvent;
 import org.coinor.opents.TabuSearchListener;
-
 import javax.swing.JSplitPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -60,6 +75,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	public static String outputFileName="output/solutions.csv";		// Default: "output/solutions.csv"
 	private static int randomSeed=-1;								// Default: random seed
 	private static boolean autoMode = false;
+	private static String emailDest = null;
+	private static String smtpHost = "localhost";
 	/**
 	 * Launch the application.
 	 * @throws UnsupportedLookAndFeelException 
@@ -84,6 +101,12 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							autoMode = true;
 						else
 							autoMode = false;
+						break;
+					case "-email":
+						emailDest  = args[i+1];
+						break;
+					case "-smtp":
+						smtpHost = args[i+1];
 						break;
 					case "-rs":
 						randomSeed = Integer.parseInt(args[i+1]);
@@ -437,10 +460,14 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 			public void actionPerformed(ActionEvent arg0) {
 				
 				Thread t = new Thread(){
+					private static final int BUFFER = 2048;
+
 					@SuppressWarnings("deprecation")
 					@Override
 					public void run()
 					{
+						List<String> resultsOut = new ArrayList<String>();
+						
 						try {
 							runs = 1;
 							String[] fnames = null;
@@ -546,7 +573,74 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 										System.out.println("Search run "+r+" ended.");
 									}
 								} // End for run
+								
+								if (!resultsOut.contains(MainFrame.outputFileName))
+									resultsOut.add(MainFrame.outputFileName);
+								
 							}
+							
+							// If an email is planned, ship it out now!
+							if (emailDest!=null)
+							{
+								System.out.println("Creating ZipFile and sending Email to "+emailDest);
+								try
+								{
+									// PREPARE VARIABLES
+									long now = (new Date()).getTime(); 
+									File attachmentFile = new File("results_"+now+".zip");
+									String attachmentFileName = attachmentFile.getName();
+									
+									
+									String htmlBody = "<p>Hi,<br/> "
+											+ "I've completed all the work."
+											+ "Please look at the attachment, save it and run another test against me!</p>"
+											+ "<p>Cheers!</p>";
+									
+									// PREPARE ZIP FILE
+									FileOutputStream fos = new FileOutputStream(attachmentFile);
+									ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fos));
+									
+									for(String s : resultsOut)
+									{
+										ZipEntry entry = new ZipEntry(s);
+										out.putNextEntry(entry);
+										FileInputStream fi = new FileInputStream(s);
+										byte data[] = new byte[BUFFER ];
+										int count;
+										while((count = fi.read(data, 0, BUFFER)) != -1) {
+										   out.write(data, 0, count);
+										}
+										fi.close();
+									}
+									out.close();
+									
+							        Multipart mp = new MimeMultipart();
+							        MimeBodyPart htmlPart = new MimeBodyPart();
+							        htmlPart.setContent(htmlBody, "text/html");
+							        mp.addBodyPart(htmlPart);
+							        MimeBodyPart attachment = new MimeBodyPart();
+							        DataSource source = new FileDataSource(attachmentFile);
+							        attachment.setDataHandler(new DataHandler(source));
+							        attachment.setFileName(attachmentFileName);
+							        mp.addBodyPart(attachment);
+							        
+							        Properties props = new Properties();
+							        props.setProperty("mail.smtp.host", smtpHost);
+									Session session = Session.getDefaultInstance(props,null);
+									Message msg = new MimeMessage(session);
+									msg.setContent(mp);
+									
+									msg.setFrom(new InternetAddress("albertogeniola@gmail.com", "Alberto Geniola - BOT"));
+						            msg.addRecipient(Message.RecipientType.TO,new InternetAddress(emailDest, "GM Admin"));
+						            msg.setSubject("GMAlg has done!");
+						            Transport.send(msg);
+						            attachmentFile.delete();
+								}
+								catch(Exception e){
+									System.err.println("Error during email shipment/zip compression");
+									e.printStackTrace();
+								}
+							} // End Send Mail
 							
 							// When here, if the -auto param was set, exit
 							if (autoMode)

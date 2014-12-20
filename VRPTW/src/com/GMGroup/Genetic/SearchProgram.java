@@ -229,7 +229,6 @@ public class SearchProgram extends Thread{
 		allRes.add(sb.toString());
 		for (String ls : allRes)
 			writer.write(ls.toString());
-		
 		writer.close();
 	}
 
