@@ -148,7 +148,6 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private JLabel lblCurrentTopVal=null;
 	private MySearchParameters currentParams;
 	public MainFrame(String inputFileName, String outputFileName, int randomSeed) {
-		setResizable(false);
 		currentParams=new MySearchParameters();
 		setTitle("Alg Conf.");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
