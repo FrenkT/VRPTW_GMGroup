@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.jgap.RandomGenerator;
 
+@SuppressWarnings("serial")
 public class MyRandomGenerator implements RandomGenerator{
 
 	private static MyRandomGenerator instance;

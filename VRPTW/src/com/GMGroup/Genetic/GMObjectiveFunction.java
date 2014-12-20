@@ -1,13 +1,7 @@
 package com.GMGroup.Genetic;
 
-import java.awt.geom.Point2D;
-
 import org.jgap.Gene;
 import org.jgap.IChromosome;
-
-import com.mdvrp.Customer;
-import com.mdvrp.Depot;
-import com.mdvrp.Instance;
 
 public class GMObjectiveFunction {
 

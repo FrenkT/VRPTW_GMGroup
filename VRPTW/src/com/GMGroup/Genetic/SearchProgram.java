@@ -24,16 +24,19 @@ public class SearchProgram extends Thread{
 	private Configuration conf;
 	private MySearchParameters params;
 	
+	@SuppressWarnings("deprecation")
 	public SearchProgram(String fileName,int seed,MySearchParameters params) throws Exception
 	{
+		if (fileName==null)
+		{
+			throw new IllegalArgumentException("No file name specified in Parameters.");
+		}
+		
 		this.params = params;
 		stopped=false;
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
 		parameters.updateParameters(new String[]{"-if",fileName});
-		if(parameters.getInputFileName() == null){
-			throw new IllegalArgumentException("No file name specified in Parameters.");
-		}
 		Instance.setInstance(parameters);
 		Instance instance = Instance.getInstance();
 		instance.populateFromHombergFile(parameters.getInputFileName());
@@ -178,6 +181,9 @@ public class SearchProgram extends Thread{
 					"INPUT FILE"
 					,"TimeLapsed"
 					,"INITIAL_POPULATION_SIZE"
+					,"MAX_WAITING_VEHICLE_NUMBER_RATIO"
+					,"MAX_WAITABLE_TIME_RATIO"
+					,"FEASIBILITY_"
 					,"MAX_EVOLVE_ITERATIONS"
 					,"CROSS_OVER_LIMIT_RATIO"
 					,"MUTATION_ALPHA_PARAM"
@@ -187,6 +193,8 @@ public class SearchProgram extends Thread{
 					,"INITIAL_POP_FASIBILITY_%"
 					,"TW_PENALTY"
 					,"CAPACITY_PENALTY"
+					,"BEST_RESULT"
+					,"BEST_FEASIBILITY"
 					,"BEST_RESULT"
 			};
 			StringBuilder sb = new StringBuilder();
@@ -199,6 +207,8 @@ public class SearchProgram extends Thread{
 				Instance.getInstance().getParameters().getInputFileName()
 				,"300" // We always run for 5 minutes
 				,""+params.getInitialPopulationSize()
+				,""+MyChromosomeFactory.MAX_WAITING_VEHICLE_NUMBER_RATIO
+				,""+MyChromosomeFactory.MAX_WAITABLE_TIME_RATIO
 				,""+params.getMaxEvolveIterations()
 				,""+params.getCrossOverLimitRatio()
 				,""+params.getAlphaParameterKChain()
@@ -209,7 +219,8 @@ public class SearchProgram extends Thread{
 				,"" + MyFitnessFunction.TimeWPenalty
 				,"" + MyFitnessFunction.CapacityPenalty
 				,""+GMObjectiveFunction.evaluate(best)
-				,""// Time
+				,""+MyChromosomeFactory.getIsChromosomeFeasible(best)
+				,"["+MyChromosomeFactory.PrintChromosome(best)+"]"
 		};
 		StringBuilder sb = new StringBuilder();
 		for(String s : rsltStr)
@@ -222,6 +233,7 @@ public class SearchProgram extends Thread{
 		writer.close();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void halt() {
 		// TODO Auto-generated method stub
 		stopped = true;

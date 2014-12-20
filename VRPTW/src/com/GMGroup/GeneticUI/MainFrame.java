@@ -13,9 +13,9 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.GMGroup.Genetic.MyChromosomeFactory;
 import com.GMGroup.Genetic.MySearchParameters;
 import com.GMGroup.Genetic.SearchProgram;
-import com.TabuSearch.MovesType;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -36,6 +36,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JCheckBox;
 
+@SuppressWarnings("serial")
 public class MainFrame extends JFrame implements TabuSearchListener{
 
 	private JPanel contentPane;
@@ -58,6 +59,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private static String inputFileName=null;						// Default: null
 	public static String outputFileName="output/solutions.csv";		// Default: "output/solutions.csv"
 	private static int randomSeed=-1;								// Default: random seed
+	private static boolean autoMode = false;
 	/**
 	 * Launch the application.
 	 * @throws UnsupportedLookAndFeelException 
@@ -76,6 +78,12 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 						break;
 					case "-of":
 						outputFileName = args[i+1];
+						break;
+					case "-auto":
+						if (Integer.parseInt(args[i+1])==1)
+							autoMode = true;
+						else
+							autoMode = false;
 						break;
 					case "-rs":
 						randomSeed = Integer.parseInt(args[i+1]);
@@ -97,6 +105,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 				try {
 					instance= new MainFrame(inputFileName,outputFileName,randomSeed);
 					instance.setVisible(true);
+					if (autoMode)
+						instance.fireStart();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -104,16 +114,22 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		});
 	}
 
+	protected void fireStart() {
+		btnStart.doClick();
+	}
+
 	/**
 	 * Create the frame.
 	 */
+	private final JButton btnStart = new JButton("Start");
 	private JLabel lblCurrentTopVal=null;
 	private MySearchParameters currentParams;
 	public MainFrame(String inputFileName, String outputFileName, int randomSeed) {
+		setResizable(false);
 		currentParams=new MySearchParameters();
 		setTitle("Alg Conf.");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 314, 611);
+		setBounds(100, 100, 322, 667);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -152,7 +168,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		
-		final JButton btnStart = new JButton("Start");
+		
 		splitPane.setLeftComponent(btnStart);
 		
 		final JButton btnStop = new JButton("Stop");
@@ -221,6 +237,20 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		crossoverWindowInput.setColumns(10);
 		
 		JLabel label_8 = new JLabel("#");
+		
+		factoryWaitableRatioInput = new JTextField();
+		factoryWaitableRatioInput.setColumns(10);
+		
+		JLabel lblNewLabel = new JLabel("Factory Waitable Ratio:");
+		
+		waitingVehicleInput = new JTextField();
+		waitingVehicleInput.setColumns(10);
+		
+		JLabel lblNewLabel_2 = new JLabel("Factory MAX Waiting Vehicle:");
+		
+		JLabel label_9 = new JLabel("0...1");
+		
+		JLabel label_10 = new JLabel("#");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -251,32 +281,34 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							.addComponent(runsInput, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-									.addComponent(cbFileList, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
-									.addGroup(gl_contentPane.createSequentialGroup()
-										.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-											.addComponent(lblCrossoverParam, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
-											.addComponent(lblTabuDeltaThreshold))
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-											.addComponent(maxEvolveIterationsInput, Alignment.LEADING)
-											.addComponent(initialPopulationInput, Alignment.LEADING)
-											.addComponent(crossOverLimitRatioInput, Alignment.LEADING)
-											.addComponent(alphaParamInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
-											.addComponent(numOfKChainSwapsInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
-											.addComponent(tabuNonImprovingThresholdInput, Alignment.LEADING)
-											.addComponent(tabuDeltaThresholdInput, Alignment.LEADING)
-											.addComponent(feasibilityPercentageInput, Alignment.LEADING)
-											.addComponent(crossoverWindowInput, Alignment.LEADING)))
-									.addComponent(lblInitialPopFeas)
-									.addComponent(lblCrossover)
-									.addComponent(lblTabuNonImproving, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(cbFileList, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+								.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblCrossoverParam, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblTabuDeltaThreshold)
+										.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblNewLabel_2))
+									.addPreferredGap(ComponentPlacement.RELATED)
 									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(lblKchainSwaps, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(lblMaxEvolveIterations, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
-									.addComponent(lblMutationparam))
-								.addComponent(lblCrossoverWindowWidth))
+										.addComponent(maxEvolveIterationsInput, Alignment.LEADING)
+										.addComponent(initialPopulationInput, Alignment.LEADING)
+										.addComponent(crossOverLimitRatioInput, Alignment.LEADING)
+										.addComponent(alphaParamInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+										.addComponent(numOfKChainSwapsInput, Alignment.LEADING, 105, 105, Short.MAX_VALUE)
+										.addComponent(tabuNonImprovingThresholdInput, Alignment.LEADING)
+										.addComponent(tabuDeltaThresholdInput, Alignment.LEADING)
+										.addComponent(feasibilityPercentageInput, Alignment.LEADING)
+										.addComponent(crossoverWindowInput, Alignment.LEADING)
+										.addComponent(factoryWaitableRatioInput, Alignment.LEADING)
+										.addComponent(waitingVehicleInput, Alignment.LEADING)))
+								.addComponent(lblInitialPopFeas, Alignment.LEADING)
+								.addComponent(lblCrossover, Alignment.LEADING)
+								.addComponent(lblTabuNonImproving, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblKchainSwaps, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblMaxEvolveIterations, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+								.addComponent(lblMutationparam, Alignment.LEADING)
+								.addComponent(lblCrossoverWindowWidth, Alignment.LEADING))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 								.addComponent(label_8, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE)
@@ -287,7 +319,9 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 								.addComponent(label_3)
 								.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 11, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label)
-								.addComponent(label_2, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE))))
+								.addComponent(label_2, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+								.addComponent(label_9, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_10, GroupLayout.PREFERRED_SIZE, 8, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
@@ -362,7 +396,17 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 						.addComponent(lblCrossoverWindowWidth)
 						.addComponent(crossoverWindowInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(label_8))
-					.addPreferredGap(ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(factoryWaitableRatioInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel)
+						.addComponent(label_9))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(waitingVehicleInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_2)
+						.addComponent(label_10))
+					.addPreferredGap(ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(chkbxStopAt5)
 						.addComponent(chckbxBatchRun)
@@ -393,6 +437,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 			public void actionPerformed(ActionEvent arg0) {
 				
 				Thread t = new Thread(){
+					@SuppressWarnings("deprecation")
 					@Override
 					public void run()
 					{
@@ -405,24 +450,25 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 								MainFrame.outputFileName=null; 	// Setting up this param to null will make the algorithm to save results into different files.
 								runs = Integer.parseInt(runsInput.getText());
 								 fnames=new String[]{
-										"rC101.txt",
-										"rC102.txt",
-										"rC103.txt",
-										"rC104.txt",
-										"rC105.txt",
-										"rC106.txt",
-										"rC107.txt",
-										"rC108.txt",
-										"rC201.txt",
-										"rC202.txt",
-										"rC203.txt",
-										"rC204.txt",
-										"rC205.txt",
-										"rC206.txt",
-										"rC207.txt",
-										"rC208.txt"
+										"RC101.txt",
+										"RC102.txt",
+										"RC103.txt",
+										"RC104.txt",
+										"RC105.txt",
+										"RC106.txt",
+										"RC107.txt",
+										"RC108.txt",
+										"RC201.txt",
+										"RC202.txt",
+										"RC203.txt",
+										"RC204.txt",
+										"RC205.txt",
+										"RC206.txt",
+										"RC207.txt",
+										"RC208.txt"
 								};
 								System.out.println("*************** GM Will run for "+runs+" times. ***************");
+								System.out.println("*************** Random Seed will be incremented at each time. ***************");
 							}
 							else
 								fnames = new String[]{cbFileList.getSelectedItem().toString()};
@@ -431,7 +477,18 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							{
 								for (int r = 0;r<runs;r++)
 								{
+									if (MainFrame.randomSeed>=0)
+									{
+										MainFrame.randomSeed++;
+										System.out.println("-- Setting Random seed to "+MainFrame.randomSeed+" --");
+									}
+									
 									// Setting up parameters
+									// Static Stuff
+									MyChromosomeFactory.MAX_WAITING_VEHICLE_NUMBER_RATIO = Double.parseDouble(waitingVehicleInput.getText());
+									MyChromosomeFactory.MAX_WAITABLE_TIME_RATIO = Double.parseDouble(factoryWaitableRatioInput.getText());
+									
+									// Params obj
 									currentParams.setAlphaParameterKChain(Double.parseDouble(alphaParamInput.getText()));
 									currentParams.setCrossOverLimitRatio(Double.parseDouble(crossOverLimitRatioInput.getText()));
 									currentParams.setInitialPopulationSize(Integer.parseInt(initialPopulationInput.getText()));
@@ -491,6 +548,10 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 								} // End for run
 							}
 							
+							// When here, if the -auto param was set, exit
+							if (autoMode)
+								System.exit(0);
+							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -512,6 +573,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 		crossOverLimitRatioInput.setText(""+currentParams.getCrossOverLimitRatio());
 		feasibilityPercentageInput.setText(""+currentParams.getInitialPopFeasibleChromosomesRatio());
 		crossoverWindowInput.setText(""+currentParams.getCrossOverWindowWidth());
+		factoryWaitableRatioInput.setText(""+MyChromosomeFactory.MAX_WAITABLE_TIME_RATIO);
+		waitingVehicleInput.setText(""+MyChromosomeFactory.MAX_WAITING_VEHICLE_NUMBER_RATIO);
 		if (inputFileName!=null)
 			cbFileList.setSelectedItem(inputFileName);
 	}
@@ -525,6 +588,8 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 	private JTextField runsInput;
 	private int runs=0;
 	private JTextField crossoverWindowInput;
+	private JTextField factoryWaitableRatioInput;
+	private JTextField waitingVehicleInput;
 	
 	
 	

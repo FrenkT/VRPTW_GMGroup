@@ -1,21 +1,15 @@
 package com.GMGroup.Genetic;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
-import org.jgap.RandomGenerator;
 import org.jgap.impl.IntegerGene;
-
 import com.mdvrp.Customer;
 import com.mdvrp.Instance;
 
@@ -23,9 +17,9 @@ public class MyChromosomeFactory {
 
 	private static final boolean DEBUG = false;
 	private static MyChromosomeFactory instance;
-	private static final double MAX_WAITABLE_TIME_RATIO = 0.08;
-	private static final double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
-	private static final double MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
+	public static double MAX_WAITABLE_TIME_RATIO = 0.08;
+	public static double MAX_WAITING_VEHICLE_NUMBER_RATIO = 2;
+	private static final int MAX_UNASSIGNED_ALLOCABLE_VEHICLES = 5;
 	private Configuration conf;
 	
 	public static MyChromosomeFactory getInstance(Configuration conf) throws InvalidConfigurationException
@@ -89,9 +83,10 @@ public class MyChromosomeFactory {
 	 * @throws Exception 
 	 *  
 	 **/
+	@SuppressWarnings("unchecked")
 	public IChromosome generateInitialFeasibleChromosome() throws Exception
 	{	
-		Point2D depot = Accelerator.getInstance().getDepotLocaltion();
+		//Point2D depot = Accelerator.getInstance().getDepotLocaltion();
 		double depotDueTime = Accelerator.getInstance().getDepotDueTime();
 		
 		// Copia i clienti in una nuova struttura randomizzandone l'ordine
@@ -153,14 +148,14 @@ public class MyChromosomeFactory {
 				
 				if ((nextCustomer.getCapacity() + cost ) <= capacityPerVeichle)
 				{
-					String toPrint = "";
+					//String toPrint = null;
 					// Se è il primo customer, parti dal depot
 					if (veichle.size() == 0)
 					{
 						// Calcolo distanza dal depot
 						lastCustomerId = nextCustomer.getNumber() + 1;
 						distanceOrTime = Accelerator.getInstance().getDistanceBetween(0, lastCustomerId);
-						toPrint = (nextCustomer.getNumber()+1)+";"+depot+";"+lastCustomerId+";"+distanceOrTime+";"+elapsedTime;
+						//toPrint = (nextCustomer.getNumber()+1)+";"+depot+";"+lastCustomerId+";"+distanceOrTime+";"+elapsedTime;
 					}
 					else
 					{
@@ -168,7 +163,7 @@ public class MyChromosomeFactory {
 						int tmpCustomerId = nextCustomer.getNumber() + 1;
 						distanceOrTime = Accelerator.getInstance().getDistanceBetween(lastCustomerId, tmpCustomerId);
 						lastCustomerId = tmpCustomerId;
-						toPrint = (nextCustomer.getNumber()+1)+";"+lastCustomerId+";"+tmpCustomerId+";"+distanceOrTime+";"+elapsedTime;
+						//toPrint = (nextCustomer.getNumber()+1)+";"+lastCustomerId+";"+tmpCustomerId+";"+distanceOrTime+";"+elapsedTime;
 					}
 					
 					// Aggiungilo solo se rispetta le tw
@@ -179,10 +174,10 @@ public class MyChromosomeFactory {
 						
 						if (elapsedTime + distanceOrTime + timeToWait + nextCustomer.getServiceDuration() + Accelerator.getInstance().getDistanceBetween(0, lastCustomerId) <= depotDueTime)		
 						{
-							toPrint += ";" + nextCustomer.getServiceDuration()+";"+((timeToWait > 0 ? timeToWait :"No wait"));
+							//toPrint += ";" + nextCustomer.getServiceDuration()+";"+((timeToWait > 0 ? timeToWait :"No wait"));
 							
-							if(DEBUG)
-								System.out.println(toPrint);
+							//if(DEBUG)
+							//	System.out.println(toPrint);
 							
 							if (timeToWait > 0) 
 							{

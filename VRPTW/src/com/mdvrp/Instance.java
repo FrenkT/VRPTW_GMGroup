@@ -133,10 +133,10 @@ public class Instance {
 			
 			Accelerator.getInstance().setData(customers,depots.get(0));
 			
-			sortAssignedCustomers();	// TODO VALE LA PENA SORTARE?
+			sortAssignedCustomers();
 		} catch (FileNotFoundException e) {
 			// File not found
-			System.out.println("File not found!");
+			System.out.println("File not found: "+parameters.getCurrDir() + "/input/" + filename);
 			System.exit(-1);
 		}
 	}

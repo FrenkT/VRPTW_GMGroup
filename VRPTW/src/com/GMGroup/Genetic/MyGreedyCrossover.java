@@ -9,6 +9,7 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 import org.jgap.impl.GreedyCrossover;
 
+@SuppressWarnings("serial")
 public class MyGreedyCrossover extends GreedyCrossover {
 
 	private double m_rate = 0.5;
@@ -39,6 +40,7 @@ public class MyGreedyCrossover extends GreedyCrossover {
 		return m_rate;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void operate(final Population a_population, final List a_candidateChromosomes) {
 		

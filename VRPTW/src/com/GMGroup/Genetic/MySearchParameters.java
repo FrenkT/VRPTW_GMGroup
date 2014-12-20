@@ -25,7 +25,7 @@ public class MySearchParameters {
 	
 	/**
 	 * Defines the AlphaParameter of the KChainMutation operator.
-	 * Default value is 5. //TODO //FIXME
+	 * Default value is 5.
 	 */
 	private double alphaParameterKChain = 5;
 	

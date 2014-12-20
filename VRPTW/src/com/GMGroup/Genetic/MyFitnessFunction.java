@@ -4,9 +4,10 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
 
+@SuppressWarnings("serial")
 public class MyFitnessFunction extends FitnessFunction {
 
-	public final static double CapacityPenalty = 50; // TODO
+	public final static double CapacityPenalty = 50;
 	public final static double TimeWPenalty = 5;
 	
 	

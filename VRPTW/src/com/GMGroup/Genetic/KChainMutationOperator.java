@@ -3,6 +3,7 @@ package com.GMGroup.Genetic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -12,6 +13,7 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 import org.jgap.impl.SwappingMutationOperator;
 
+@SuppressWarnings("serial")
 public class KChainMutationOperator extends SwappingMutationOperator{
 	
 	/**
@@ -45,6 +47,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	}
 	
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
 		
@@ -135,7 +138,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		
 		
 	    int from, first, to;
-	    Gene[] genes = a_chrom.getGenes(); //TODO: check a_rate == param set before
+	    Gene[] genes = a_chrom.getGenes();
 
 	    first = a_generator.nextInt(a_chrom.size()); //scelgo a caso il primp gene della k-chain
 	    
@@ -167,7 +170,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 	 */
 	@Override
 	public void setMutationRate(int param){
-		super.setMutationRate(param); // TODO check param = a_rate into operate
+		super.setMutationRate(param);
 	}
 	
 	public void setAlpha(double alpha)

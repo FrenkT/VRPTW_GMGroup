@@ -2,10 +2,6 @@ package com.GMGroup.Genetic;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
-import org.jgap.Chromosome;
-import org.jgap.IChromosome;
-
 import com.mdvrp.Customer;
 import com.mdvrp.Depot;
 
@@ -102,7 +98,7 @@ public class Accelerator {
 				else if (j==0)
 				{
 					to = depot.getLocation();
-					//distances[i][j]=from.distance(to);//TODO //FIXME Changing this to the Prof version. I disagree, but let's be consistent
+					//distances[i][j]=from.distance(to); //FIXME Changing this to the Prof version. I disagree, but let's be consistent
 					distances[i][j] = Math.sqrt(Math.pow(from.getX() - to.getX(), 2)
 							+ Math.pow(from.getY() - to.getY(), 2));
 					distances[i][j] = Math.floor(distances[i][j] * 10) / 10;

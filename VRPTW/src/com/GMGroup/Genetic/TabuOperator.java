@@ -35,7 +35,7 @@ public class TabuOperator extends BaseGeneticOperator{
 	private int maxIterationThreshold;
 	
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void operate(final Population a_population, List a_candidateChromosomes) {
 

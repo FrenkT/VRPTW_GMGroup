@@ -7,7 +7,6 @@ import java.util.Vector;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
-import org.jgap.ICompositeGene;
 import org.jgap.IGeneticOperatorConstraint;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
@@ -15,6 +14,7 @@ import org.jgap.RandomGenerator;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.IntegerGene;
 
+@SuppressWarnings("serial")
 public class MyPMXCrossover extends CrossoverOperator{
 	
 	private double crossoverRate=0.5; 
@@ -43,6 +43,7 @@ public class MyPMXCrossover extends CrossoverOperator{
 		this.windowlength=windowlength;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void operate(final Population a_population, final List a_candidateChromosomes) {
 		
@@ -112,6 +113,7 @@ public class MyPMXCrossover extends CrossoverOperator{
 	}
 	
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected void doCrossover(IChromosome firstMate, IChromosome secondMate,
 			List a_candidateChromosomes, RandomGenerator generator) {
