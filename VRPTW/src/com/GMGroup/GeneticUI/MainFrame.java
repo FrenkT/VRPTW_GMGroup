@@ -473,7 +473,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							// Batch run
 							if (chckbxBatchRun.isSelected())
 							{
-								MainFrame.outputFileName=null; 	// Setting up this param to null will make the algorithm to save results into different files.
+								MainFrame.outputFileName=null;
 								runs = Integer.parseInt(runsInput.getText());
 								 fnames=new String[]{
 										"RC101.txt",
@@ -501,6 +501,7 @@ public class MainFrame extends JFrame implements TabuSearchListener{
 							
 							for (String s:fnames)
 							{
+								MainFrame.outputFileName = (MainFrame.outputFileName == null ? s+".csv" : MainFrame.outputFileName);
 								for (int r = 0;r<runs;r++)
 								{
 									if (MainFrame.randomSeed>=0)
