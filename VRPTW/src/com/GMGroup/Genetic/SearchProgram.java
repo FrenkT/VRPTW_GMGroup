@@ -1,16 +1,19 @@
 package com.GMGroup.Genetic;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
+
 import com.GMGroup.GeneticUI.MainFrame;
 import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
@@ -202,7 +205,7 @@ public class SearchProgram extends Thread{
 				sb.append(s+";");
 			allRes.add(sb.toString());
 		}
-		FileWriter writer = new FileWriter(outputFile,true);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,true));
 		String[] rsltStr = new String[]{
 				Instance.getInstance().getParameters().getInputFileName()
 				,"300" // We always run for 5 minutes
@@ -228,7 +231,10 @@ public class SearchProgram extends Thread{
 		
 		allRes.add(sb.toString());
 		for (String ls : allRes)
+		{
 			writer.write(ls.toString());
+			writer.newLine();
+		}
 		writer.close();
 	}
 
