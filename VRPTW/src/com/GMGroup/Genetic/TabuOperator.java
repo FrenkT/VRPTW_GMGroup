@@ -34,6 +34,25 @@ public class TabuOperator extends BaseGeneticOperator{
 	private double minDeltaThreshold;
 	private int maxIterationThreshold;
 	
+	public int getMaxIterationThreshold()
+	{
+		return this.maxIterationThreshold;
+	}
+	
+	public void setMaxIterationThreshold(int iterationThreshold)
+	{
+		this.maxIterationThreshold=iterationThreshold;
+	}
+	
+	public void setMinDeltaThreshold(double delta)
+	{
+		this.minDeltaThreshold=delta;
+	}
+	
+	public double getMinDeltaThreshold()
+	{
+		return minDeltaThreshold;
+	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override

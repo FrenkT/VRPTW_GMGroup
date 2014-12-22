@@ -773,9 +773,9 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
         // While not canceled and iterations left to go
         while( keepSolving && ( iterationsToGo > 0 ) )
         {   
-            Thread.yield();  
+            Thread.yield();
             try {
-	            synchronized( this )
+            	synchronized( this )
 	            {
 	                iterationsToGo--;
 	                
@@ -823,9 +823,9 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      * @since 1.0
      */
     public synchronized boolean isSolving()
-    {   return solving;
-    }   // end isSolving
-    
+    {   
+    	return solving;
+    }
     
     
     /**
@@ -870,7 +870,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized void setTabuList( TabuList tabuList )
     {   this.tabuList = tabuList;
-    }   // end setTabuList
+    }   
     
     
     
@@ -884,7 +884,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized void setAspirationCriteria( AspirationCriteria aspirationCriteria )
     {   this.aspirationCriteria = aspirationCriteria;
-    }   // end setAspirationCriteria
+    }   
     
     
     
@@ -899,7 +899,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
     public synchronized void setBestSolution( Solution solution )
     {   
         internalSetBestSolution( solution );
-    }   // end setBestSolution
+    }   
     
     
     
@@ -914,7 +914,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
     public synchronized void setCurrentSolution( Solution solution )
     {   
         internalSetCurrentSolution( solution );
-    }   // end setCurrentSolution
+    }   
     
     
     
@@ -933,7 +933,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized void setIterationsToGo( int iterations )
     {   this.iterationsToGo = iterations;
-    }   // end setIterationsToGo
+    }   
     
     
     
@@ -949,7 +949,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized void setMaximizing( boolean maximizing )
     {   this.maximizing = maximizing;
-    }   // end setMaximizing
+    }   
     
     
     /**
@@ -966,7 +966,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized void setChooseFirstImprovingMove( boolean choose )
     {   this.chooseFirstImprovingMove = choose;
-    }   // end setChooseFirstImprovingMove
+    }   
     
     
     /**
@@ -978,7 +978,7 @@ public class SingleThreadedTabuSearch extends TabuSearchBase
      */
     public synchronized ObjectiveFunction getObjectiveFunction()
     {   return objectiveFunction;
-    }   // end getObjectiveFunction
+    }   
     
     
     

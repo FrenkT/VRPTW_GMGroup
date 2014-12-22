@@ -67,6 +67,13 @@ public class MySearchParameters {
 	private double initialPopFeasibleChromosomesRatio = 50;
 	
 	/**
+	 * Describes the policy to apply when no feasible solution is found at the end of each evolve
+	 * iteration. Default value is INCREASE_POPULATION.
+	 */
+	private InfeasibilityPolicy infeasibilityPolicy = InfeasibilityPolicy.RELAX_TABU;
+	
+	
+	/**
 	 * @return the tabuDeltaRatio
 	 */
 	public double getTabuDeltaRatio() {
@@ -195,6 +202,20 @@ public class MySearchParameters {
 		if (crossOverWindowWidth<0)
 			throw new IllegalArgumentException("CrossOverWindowWidth cannot be a negative value");
 		this.crossOverWindowWidth = crossOverWindowWidth;
+	}
+
+	/**
+	 * @return the infeasibilityPolicy
+	 */
+	public InfeasibilityPolicy getInfeasibilityPolicy() {
+		return infeasibilityPolicy;
+	}
+
+	/**
+	 * @param infeasibilityPolicy the infeasibilityPolicy to set
+	 */
+	public void setInfeasibilityPolicy(InfeasibilityPolicy infeasibilityPolicy) {
+		this.infeasibilityPolicy = infeasibilityPolicy;
 	}
 	
 	

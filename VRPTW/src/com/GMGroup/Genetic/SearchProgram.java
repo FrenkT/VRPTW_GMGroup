@@ -7,10 +7,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.coinor.opents.Main;
 import org.jgap.Configuration;
 import org.jgap.Gene;
+import org.jgap.GeneticOperator;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
+import org.jgap.Population;
+import org.jgap.audit.IEvolutionMonitor;
+import org.jgap.eval.PopulationHistoryIndexed;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.DefaultConfiguration;
 
@@ -19,13 +24,14 @@ import com.mdvrp.Instance;
 import com.mdvrp.Parameters;
 
 
-public class SearchProgram extends Thread{
+public class SearchProgram extends Thread {
 
 	private boolean stopped=false;
 	private MyPMXCrossover cop;
 	private KChainMutationOperator mop;
 	private Configuration conf;
 	private MySearchParameters params;
+	private double RELAXING_FACTOR = 0.5;
 	
 	@SuppressWarnings("deprecation")
 	public SearchProgram(String fileName,int seed,MySearchParameters params) throws Exception
@@ -120,17 +126,60 @@ public class SearchProgram extends Thread{
 		try {
 			if (stopped)
 				System.err.println("Cannot start a thread which has been previously stopped.");
+						
+			//IChromosome c = population.getFittestChromosome();
+			//double res = GMObjectiveFunction.evaluate(c);
+			//System.out.println("Best of population Before EVOLVE: "+res);
 			
-			IChromosome c = population.getFittestChromosome();
-			double res = GMObjectiveFunction.evaluate(c);
-			System.out.println("Best of population Before EVOLVE: "+res);
-			
-			population.evolve(params.getMaxEvolveIterations()==0?Integer.MAX_VALUE:params.getMaxEvolveIterations());
+			int maxIt = params.getMaxEvolveIterations()<=0 ? Integer.MAX_VALUE : params.getMaxEvolveIterations();
+			boolean tabuRelaxed = false;
+			for (int i=0;i<maxIt;i++)
+			{
+				// Evolve once
+				population.evolve();
+				double bestFeasibleVal = 0;
+				double bestValue = 0;
+				// Look for best feasible chromosome
+				for (IChromosome c : population.getPopulation().getChromosomes())
+				{
+					double val = GMObjectiveFunction.evaluate(c);
+					boolean feasible = MyChromosomeFactory.getIsChromosomeFeasible(c);
+					
+					if (feasible)
+					{
+						if (val>bestFeasibleVal)
+							bestFeasibleVal = val;
+					}
+					else
+					{
+						if (val>bestValue)
+							bestValue = val;
+					}
+					
+				}
+				
+				MainFrame.getInstance().setBestResult(bestValue);
+				MainFrame.getInstance().setBestFeasible(bestFeasibleVal);
+				MainFrame.getInstance().setFeasibility(bestFeasibleVal>0);
+				
+				if (!tabuRelaxed && bestFeasibleVal==0)
+				{
+					RelaxTabu();
+					tabuRelaxed=true;
+				}
+				else if (tabuRelaxed==true && bestFeasibleVal>0)
+				{
+					UnRelaxTabu();
+					tabuRelaxed=false;
+				}
+				
+				
+				
+			}
 			
 			try {
 				PrintStatus();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -139,6 +188,30 @@ public class SearchProgram extends Thread{
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	private void RelaxTabu() {
+		for (Object o : population.getConfiguration().getGeneticOperators())
+		{
+			if (o instanceof TabuOperator)
+			{
+				TabuOperator tabu = (TabuOperator)o;
+				int newIt = (int)(tabu.getMaxIterationThreshold()*RELAXING_FACTOR);
+				tabu.setMaxIterationThreshold(newIt);
+			}
+		}
+	}
+	
+	private void UnRelaxTabu() {
+		for (Object o : population.getConfiguration().getGeneticOperators())
+		{
+			if (o instanceof TabuOperator)
+			{
+				TabuOperator tabu = (TabuOperator)o;
+				int newIt = (int)(tabu.getMaxIterationThreshold()/RELAXING_FACTOR);
+				tabu.setMaxIterationThreshold(newIt);
+			}
+		}	
 	}
 
 	public void PrintStatus() throws IOException
@@ -172,8 +245,14 @@ public class SearchProgram extends Thread{
 		if (best==null)
 			best=population.getFittestChromosome();
 		
-		System.out.println("\nBest feasible solution: "+MyChromosomeFactory.getIsChromosomeFeasible(best)+";"+GMObjectiveFunction.evaluate(best));
+		double bestValue = GMObjectiveFunction.evaluate(best);
+		boolean feasibility = MyChromosomeFactory.getIsChromosomeFeasible(best);
+		System.out.println("\nBest feasible solution: "+feasibility+";"+bestValue);
+		//MainFrame.getInstance().setBestResult(bestValue+" ("+feasibility + ")");
 		
+		MainFrame.getInstance().setFeasibility(feasibility);
+		MainFrame.getInstance().setBestResult(bestValue);
+		MainFrame.getInstance().setBestFeasible(bestValue);
 		File outputFile = new File(MainFrame.outputFileName==null ?  Instance.getInstance().getParameters().getInputFileName()+".csv":MainFrame.outputFileName);
 		
 		List<String> allRes = new ArrayList<String>();
@@ -244,5 +323,11 @@ public class SearchProgram extends Thread{
 		stopped = true;
 		this.stop();
 		
+	}
+	
+	
+	public void setEvolutionMonitor(IEvolutionMonitor a_monitor)
+	{
+		conf.setMonitor(a_monitor);
 	}
 }
