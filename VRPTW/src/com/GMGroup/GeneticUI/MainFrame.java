@@ -590,7 +590,7 @@ public class MainFrame extends JFrame implements IEvolutionMonitor{
 									if (rdbtnRelaxTabuConstr.isSelected()) 
 										currentParams.setInfeasibilityPolicy(InfeasibilityPolicy.RELAX_TABU);
 									
-									sp = new SearchProgram(s,-1,currentParams);
+									sp = new SearchProgram(s,MainFrame.randomSeed,currentParams);
 									
 									btnStart.setEnabled(false);
 									btnStop.setEnabled(true);

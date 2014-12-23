@@ -32,6 +32,7 @@ public class SearchProgram extends Thread {
 	private Configuration conf;
 	private MySearchParameters params;
 	private double RELAXING_FACTOR = 0.5;
+	private Object[] bestFeasible;
 	
 	@SuppressWarnings("deprecation")
 	public SearchProgram(String fileName,int seed,MySearchParameters params) throws Exception
@@ -43,6 +44,11 @@ public class SearchProgram extends Thread {
 		
 		this.params = params;
 		stopped=false;
+		
+		bestFeasible = new Object[2];
+		bestFeasible[0] = Double.POSITIVE_INFINITY;
+		bestFeasible[1] = null;
+		
 		// ***** Parsing conf input file and populating Instance object *****
 		Parameters parameters = new Parameters();
 		parameters.updateParameters(new String[]{"-if",fileName});
@@ -137,8 +143,9 @@ public class SearchProgram extends Thread {
 			{
 				// Evolve once
 				population.evolve();
-				double bestFeasibleVal = 0;
-				double bestValue = 0;
+				IChromosome bestFeasibleChromosome = null;
+				double bestFeasibleVal = Double.POSITIVE_INFINITY;
+				double bestValue = Double.POSITIVE_INFINITY;
 				// Look for best feasible chromosome
 				for (IChromosome c : population.getPopulation().getChromosomes())
 				{
@@ -147,30 +154,46 @@ public class SearchProgram extends Thread {
 					
 					if (feasible)
 					{
-						if (val>bestFeasibleVal)
+						if (val<bestFeasibleVal)
+						{
 							bestFeasibleVal = val;
+							bestFeasibleChromosome=c;
+						}
 					}
 					else
 					{
-						if (val>bestValue)
+						if (val<bestValue)
 							bestValue = val;
 					}
 					
 				}
 				
+				if (bestFeasibleVal<(double)bestFeasible[0])
+				{
+					bestFeasible[0]=bestFeasibleVal;
+					bestFeasible[1]=bestFeasibleChromosome.clone();
+				}
+				/*
+				String bestFeasibleStr = bestFeasible[1]==null ? "N/A" : MyChromosomeFactory.PrintChromosome((IChromosome)bestFeasible[1]);
+				System.out.println("BestFeasible is "+bestFeasibleStr);
+				*/
 				MainFrame.getInstance().setBestResult(bestValue);
 				MainFrame.getInstance().setBestFeasible(bestFeasibleVal);
-				MainFrame.getInstance().setFeasibility(bestFeasibleVal>0);
+				MainFrame.getInstance().setFeasibility(bestFeasibleVal<Double.POSITIVE_INFINITY);
 				
-				if (!tabuRelaxed && bestFeasibleVal==0)
+				
+				if (!tabuRelaxed && bestFeasibleVal==Double.POSITIVE_INFINITY)
 				{
 					RelaxTabu();
 					tabuRelaxed=true;
+					// Increment penalties
+					MyFitnessFunction.TimeWPenalty*=10;
 				}
-				else if (tabuRelaxed==true && bestFeasibleVal>0)
+				else if (tabuRelaxed==true && bestFeasibleVal<Double.POSITIVE_INFINITY)
 				{
 					UnRelaxTabu();
 					tabuRelaxed=false;
+					MyFitnessFunction.TimeWPenalty/=10;
 				}
 				
 				
@@ -224,6 +247,7 @@ public class SearchProgram extends Thread {
 		IChromosome best = null;
 		for(int i=0;i<population.getPopulation().size();i++)
 		{
+			
 			c = population.getPopulation().getChromosome(i);
 			if (MyChromosomeFactory.getIsChromosomeFeasible(c)){
 				if (best == null){
@@ -247,6 +271,17 @@ public class SearchProgram extends Thread {
 		
 		double bestValue = GMObjectiveFunction.evaluate(best);
 		boolean feasibility = MyChromosomeFactory.getIsChromosomeFeasible(best);
+		if (!feasibility)
+		{
+			best=(IChromosome)bestFeasible[1];
+			bestValue = (double)bestFeasible[0];
+		}
+		else if (feasibility && bestValue<(double)bestFeasible[0])
+		{
+			best=(IChromosome)bestFeasible[1];
+			bestValue = (double)bestFeasible[0];
+		}
+		
 		System.out.println("\nBest feasible solution: "+feasibility+";"+bestValue);
 		//MainFrame.getInstance().setBestResult(bestValue+" ("+feasibility + ")");
 		

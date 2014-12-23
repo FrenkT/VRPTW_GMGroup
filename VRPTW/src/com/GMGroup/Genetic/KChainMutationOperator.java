@@ -100,7 +100,7 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		} else {
 			currentRate = getMutationRate();
 		}
-		RandomGenerator generator = getConfiguration().getRandomGenerator();
+		RandomGenerator generator = MyRandomGenerator.getInstance();
 		// It would be inefficient to create copies of each Chromosome just
 		// to decide whether to mutate them. Instead, we only make a copy
 		// once we've positively decided to perform a mutation.

@@ -7,8 +7,8 @@ import org.jgap.IChromosome;
 @SuppressWarnings("serial")
 public class MyFitnessFunction extends FitnessFunction {
 
-	public static final double CapacityPenalty = 50;
-	public static final double TimeWPenalty = 20;
+	public static double CapacityPenalty = 50;
+	public static double TimeWPenalty = 20;
 	
 	
 	/**
