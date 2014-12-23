@@ -7,7 +7,7 @@ import org.jgap.IChromosome;
 @SuppressWarnings("serial")
 public class MyFitnessFunction extends FitnessFunction {
 
-	public static double CapacityPenalty = 50;
+	public static double CapacityPenalty = 100;
 	public static double TimeWPenalty = 20;
 	
 	
@@ -24,9 +24,9 @@ public class MyFitnessFunction extends FitnessFunction {
 		
 		viol = MyChromosomeFactory.getEntitiesOfViolations(arg);
 		
-		for (int i=0;i<viol.length;i++)
-			if (viol[i]<0)
-				System.err.println("NEGATIVE VIOL!");
+		//for (int i=0;i<viol.length;i++)
+		//	if (viol[i]<0)
+		//		System.err.println("NEGATIVE VIOL!");
 		
 		result = GMObjectiveFunction.evaluate(arg);
 		result += (CapacityPenalty * viol[1] * viol[0]);
