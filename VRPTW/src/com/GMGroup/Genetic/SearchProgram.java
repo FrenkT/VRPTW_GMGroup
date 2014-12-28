@@ -117,7 +117,7 @@ public class SearchProgram extends Thread {
 		conf.addNaturalSelector(bestChromsSelector, false);
 		conf.setFitnessFunction(new MyFitnessFunction());
 		conf.getGeneticOperators().clear();
-		cop = new MyPMXCrossover(conf,params.getCrossOverLimitRatio(),40);
+		cop = new MyPMXCrossover(conf,params.getCrossOverLimitRatio(),params.getCrossOverWindowWidth());
 		conf.addGeneticOperator(cop);
 		mop = new KChainMutationOperator(conf);
 		mop.setAlpha(params.getAlphaParameterKChain());
