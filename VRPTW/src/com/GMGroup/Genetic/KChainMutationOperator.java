@@ -59,13 +59,13 @@ public class KChainMutationOperator extends SwappingMutationOperator{
 		double bestFit=0,worstFit=0,parameter1=0,teta=0,mutationProbability;
 		List<Double> fitnessFunctions=new ArrayList<Double>();
 		int startIndex = a_population.getConfiguration().getPopulationSize();
-        if (startIndex==0 || startIndex == a_candidateChromosomes.size())
+        if (startIndex==0)
         	return;
 		for(int i=startIndex; i<a_candidateChromosomes.size(); i++){
 			IChromosome c= (IChromosome) a_candidateChromosomes.get(i);
 			fitnessFunctions.add(c.getFitnessValue());
 			//System.out.println("Fitness:" + c.getFitnessValue());
-			}
+		}
 		Collections.sort(fitnessFunctions);
 		worstFit=fitnessFunctions.get(0);
 		bestFit=fitnessFunctions.get(fitnessFunctions.size()-1);

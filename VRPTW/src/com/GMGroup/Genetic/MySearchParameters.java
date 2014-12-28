@@ -6,7 +6,7 @@ public class MySearchParameters {
 	 * Describes how many chromosomes should be used as initial population. 
 	 * Default value is 50.
 	 */
-	private int initialPopulationSize=5;
+	private int initialPopulationSize=6;
 	
 	/**
 	 * Describes how many iteration of Genetic algorithm should be performed. A value of 0 means INFINITE,

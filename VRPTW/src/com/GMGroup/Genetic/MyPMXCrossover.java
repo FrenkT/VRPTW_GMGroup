@@ -55,7 +55,7 @@ public class MyPMXCrossover extends CrossoverOperator{
 		//eseguo il crossover solo sui parents
 		int size = Math.min(getConfiguration().getPopulationSize(),a_population.size());
 		int numCrossovers = 0;
-		numCrossovers = (int) (size/2 * crossoverRate); //numero di volte che eseguo la crossover
+		numCrossovers = (int)Math.round(size/2 * crossoverRate); //numero di volte che eseguo la crossover
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		IGeneticOperatorConstraint constraint = getConfiguration().getJGAPFactory().getGeneticOperatorConstraint();
 		// For each crossover, grab two random chromosomes, pick a random
