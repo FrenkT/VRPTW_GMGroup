@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.coinor.opents.Main;
@@ -33,6 +34,7 @@ public class SearchProgram extends Thread {
 	private MySearchParameters params;
 	private double RELAXING_FACTOR = 0.5;
 	private Object[] bestFeasible;
+	private long startTime=0;
 	
 	@SuppressWarnings("deprecation")
 	public SearchProgram(String fileName,int seed,MySearchParameters params) throws Exception
@@ -126,9 +128,12 @@ public class SearchProgram extends Thread {
 		population = new Genotype(conf,initialPop);
 	}
 	Genotype population = null;
+	private long bestTime;
 	@Override
 	public void run()
 	{
+		startTime = (new Date()).getTime();
+		bestTime=0;
 		try {
 			if (stopped)
 				System.err.println("Cannot start a thread which has been previously stopped.");
@@ -172,6 +177,7 @@ public class SearchProgram extends Thread {
 				{
 					bestFeasible[0]=bestFeasibleVal;
 					bestFeasible[1]=bestFeasibleChromosome.clone();
+					bestTime = (new Date()).getTime();
 				}
 				/*
 				String bestFeasibleStr = bestFeasible[1]==null ? "N/A" : MyChromosomeFactory.PrintChromosome((IChromosome)bestFeasible[1]);
@@ -195,9 +201,7 @@ public class SearchProgram extends Thread {
 					tabuRelaxed=false;
 					MyFitnessFunction.TimeWPenalty/=10;
 				}
-				
-				
-				
+
 			}
 			
 			try {
@@ -296,11 +300,13 @@ public class SearchProgram extends Thread {
 			// Add the header too
 			String[] header = new String[]{
 					"INPUT FILE"
-					,"TimeLapsed"
+					,"BEST_RESULT"
+					,"TIME_LAPSE"
+					,"VEHICLE_COUNT"
+					,"TIME_TO_TOP_SECONDS"
 					,"INITIAL_POPULATION_SIZE"
 					,"MAX_WAITING_VEHICLE_NUMBER_RATIO"
 					,"MAX_WAITABLE_TIME_RATIO"
-					,"FEASIBILITY_"
 					,"MAX_EVOLVE_ITERATIONS"
 					,"CROSS_OVER_LIMIT_RATIO"
 					,"MUTATION_ALPHA_PARAM"
@@ -310,19 +316,47 @@ public class SearchProgram extends Thread {
 					,"INITIAL_POP_FASIBILITY_%"
 					,"TW_PENALTY"
 					,"CAPACITY_PENALTY"
-					,"BEST_RESULT"
 					,"BEST_FEASIBILITY"
-					,"BEST_RESULT"
+					,"BEST_RESULT_CHROM"
 			};
 			StringBuilder sb = new StringBuilder();
 			for(String s : header)
 				sb.append(s+";");
 			allRes.add(sb.toString());
 		}
+		
+		// Count how many vehichles are we using
+		Gene[] gg = best.getGenes();
+		int count=0;
+		boolean v = false;
+		for (int i=0;i<gg.length;i++)
+		{
+			if (((int)gg[i].getAllele())<=0 && v)
+			{
+				count++;
+				// This is a customer, so start considering a vechichle
+				v = false;
+			}
+			
+			if (((int)gg[i].getAllele())>0)
+			{
+				v=true;
+			}
+		}
+		// Last separator (end of chromosome)
+		if (v)
+			count++;
+		
+		// Calculate TimeToTop
+		long ttt = (bestTime - startTime)/1000;
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile,true));
 		String[] rsltStr = new String[]{
 				Instance.getInstance().getParameters().getInputFileName()
+				,""+GMObjectiveFunction.evaluate(best)
 				,"300" // We always run for 5 minutes
+				,"" + count
+				,"" + ttt
 				,""+params.getInitialPopulationSize()
 				,""+MyChromosomeFactory.MAX_WAITING_VEHICLE_NUMBER_RATIO
 				,""+MyChromosomeFactory.MAX_WAITABLE_TIME_RATIO
@@ -335,7 +369,6 @@ public class SearchProgram extends Thread {
 				,""+params.getInitialPopFeasibleChromosomesRatio()
 				,"" + MyFitnessFunction.TimeWPenalty
 				,"" + MyFitnessFunction.CapacityPenalty
-				,""+GMObjectiveFunction.evaluate(best)
 				,""+MyChromosomeFactory.getIsChromosomeFeasible(best)
 				,"["+MyChromosomeFactory.PrintChromosome(best)+"]"
 		};

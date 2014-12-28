@@ -26,6 +26,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.GMGroup.Genetic.InfeasibilityPolicy;
 import com.GMGroup.Genetic.MyChromosomeFactory;
+import com.GMGroup.Genetic.MyFitnessFunction;
 import com.GMGroup.Genetic.MySearchParameters;
 import com.GMGroup.Genetic.SearchProgram;
 
@@ -590,6 +591,7 @@ public class MainFrame extends JFrame implements IEvolutionMonitor{
 									if (rdbtnRelaxTabuConstr.isSelected()) 
 										currentParams.setInfeasibilityPolicy(InfeasibilityPolicy.RELAX_TABU);
 									
+									double penaltiesBck = MyFitnessFunction.TimeWPenalty;
 									sp = new SearchProgram(s,MainFrame.randomSeed,currentParams);
 									
 									btnStart.setEnabled(false);
@@ -638,6 +640,8 @@ public class MainFrame extends JFrame implements IEvolutionMonitor{
 										sp.wait();
 										System.out.println("Search run "+r+" ended.");
 									}
+									// Restoring prev value
+									MyFitnessFunction.TimeWPenalty=penaltiesBck;
 								} // End for run
 								
 								if (!resultsOut.contains(MainFrame.outputFileName))
