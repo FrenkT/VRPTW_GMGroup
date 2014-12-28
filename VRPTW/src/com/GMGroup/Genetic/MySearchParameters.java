@@ -6,7 +6,7 @@ public class MySearchParameters {
 	 * Describes how many chromosomes should be used as initial population. 
 	 * Default value is 50.
 	 */
-	private int initialPopulationSize=50;
+	private int initialPopulationSize=5;
 	
 	/**
 	 * Describes how many iteration of Genetic algorithm should be performed. A value of 0 means INFINITE,
@@ -21,7 +21,7 @@ public class MySearchParameters {
 	 * crossovers. The input parameter should be positive. 
 	 * Default value is 0.3.
 	 */
-	private double crossOverLimitRatio = 1;
+	private double crossOverLimitRatio = 0.25;
 	
 	/**
 	 * Defines the AlphaParameter of the KChainMutation operator.
@@ -56,7 +56,7 @@ public class MySearchParameters {
 	 * Represents the window size of the PMXCrossOver. The larger, the less genes will be moved within
 	 * a single crossover.
 	 */
-	private int crossOverWindowWidth=40;
+	private int crossOverWindowWidth=80;
 	
 	
 	/**
