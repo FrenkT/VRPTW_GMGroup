@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -100,15 +101,23 @@ public class MainFrame extends JFrame implements IEvolutionMonitor{
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 * @throws InvalidActivityException 
 	 */
-	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, FileNotFoundException {
 		// Parsing dei parametri di input
 		if(args.length % 2 == 0){
 			for(int i = 0; i < args.length; i += 2){
 				switch (args[i]) {
 					case "-if":
 						inputFileName = args[i+1];
+						File f = new File(inputFileName);
+						if (!f.exists())
+						{
+							System.err.println("Input file "+inputFileName+" doesn't exists. Please check the input filename and try again.");
+							throw new FileNotFoundException("Input file "+inputFileName+" doesn't exists. Please check the input filename and try again.");
+						}
+						
 						break;
 					case "-of":
 						outputFileName = args[i+1];
