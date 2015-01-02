@@ -277,10 +277,13 @@ public class SearchProgram extends Thread {
 		boolean feasibility = MyChromosomeFactory.getIsChromosomeFeasible(best);
 		if (!feasibility)
 		{
+			if (bestFeasible[1] == null)
+				System.err.println("Error! No feasible solution found.");
+			
 			best=(IChromosome)bestFeasible[1];
 			bestValue = (double)bestFeasible[0];
 		}
-		else if (feasibility && bestValue<(double)bestFeasible[0])
+		else if (feasibility && bestValue>(double)bestFeasible[0])
 		{
 			best=(IChromosome)bestFeasible[1];
 			bestValue = (double)bestFeasible[0];
